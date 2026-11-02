@@ -74,6 +74,19 @@ Status: local source audit and disabled read-adapter preparation complete.
 See [Phase 2 audit](PHASE_2_BACKEND_CONTRACT_AUDIT.md), the machine-readable
 [route inventory](HARDWARE_ROUTE_INVENTORY.json), and `VERIFICATION.md`.
 
+## Continued local implementation (Phases 3–10)
+
+The next local milestones now include demo session/administration, persistent scoped
+catalogue and contacts, sample sales/tills/reversals, purchase/receipt/invoice drafts,
+account allocation, reports, CSV tooling and a SaaS readiness screen. **None of Phases
+3–10 is claimed production-complete.** See [the detailed progress matrix](IMPLEMENTATION_PROGRESS.md)
+for exact implemented scope and remaining work, including non-gated frontend refinements.
+
+Real sign-in/API/posting remain disabled under the user's latest instruction. The
+read-only [separate frontend connection audit](SEPARATE_FRONTEND_CONNECTION.md) lists
+source evidence and precise public configuration values required before any live wiring.
+No candidate deployment URL is treated as approved.
+
 ## Boundaries and external prerequisites
 
 All code changes stay in this repository. Current OmniPOS source inspection is read-only.

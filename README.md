@@ -11,7 +11,7 @@ npm run dev
 ```
 
 Open the localhost URL printed by Vite. `npm run build` checks TypeScript and builds
-`dist/`; `npm test` verifies search/pagination, sample-store isolation and calculations.
+`dist/`; `npm test` verifies integration guards, tenant isolation, session states, local workflows and calculations.
 
 ## SaaS roadmap
 
@@ -23,6 +23,18 @@ Phase 2 adds the [backend/session audit](docs/PHASE_2_BACKEND_CONTRACT_AUDIT.md)
 layer tested with fake responses. The app still uses sample data and has no live transport.
 The existing verified startup contract returns one organization per authenticated profile;
 production multi-company membership must not be inferred from the demo switcher.
+
+## Current local workflows
+
+See [implementation progress](docs/IMPLEMENTATION_PROGRESS.md) for working demo flows
+and remaining release gates. Product management, local contacts/stock adjustments,
+demo sales/tills/full reversals, single-line purchase/receipt/invoice drafts, account
+allocations, reports and CSV tools now share tenant-scoped browser data.
+
+Settings → Connection setup explains why live sign-in, API calls and posting remain
+disabled. The [separate frontend connection audit](docs/SEPARATE_FRONTEND_CONNECTION.md)
+records verified source behavior and exact missing public configuration. No API endpoint
+has been approved by inference. Use sample data only; this is not production SaaS security.
 
 ## Try it
 

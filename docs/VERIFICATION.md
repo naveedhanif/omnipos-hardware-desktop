@@ -97,3 +97,38 @@ Status: local audit/adapter preparation complete. No live integration is enabled
   authentication, permissions, membership, database isolation or feature availability.
 
 See `PHASE_2_BACKEND_CONTRACT_AUDIT.md` for the contract matrix and precise open gates.
+
+
+## Continued local milestones and separate-frontend preparation
+
+2 November 2026. Production phases 3–10 remain partial or gated; see
+`IMPLEMENTATION_PROGRESS.md` for exact scope.
+
+- TypeScript/Vite build passed; **39 Node tests passed**. New coverage includes session
+  missing/inactive/onboarding/store states and late expiry, local team role/last-owner
+  protection, product/stock scope, SKU validation, persistence failures, demo sale/reversal
+  stock behavior, till requirements, one-time receiving/invoice linking, allocation
+  replay/overpayment, corrupt nested/cross-tenant data, unknown valuation, all-or-nothing
+  CSV import, CSV formula protection, and disabled public connection preparation.
+- Desktop Chrome browser checks passed for local team creation, demo exit/paused reload/
+  re-entry, product creation/reload/company separation, demo sale and account allocation,
+  purchase/receipt/supplier-invoice chain, CSV import/download, role/tenant separation,
+  and locally derived reports. Workflow browser run observed zero page errors and
+  external requests. These are sample workflows only, not payment/database evidence.
+- Additional browser checks confirmed escaped user-entered SKU text cannot become markup
+  in the catalogue and that Connection setup cannot enable sign-in/API/posting.
+- Desktop and 390px mobile screenshots inspected. Mobile report values now fit without
+  horizontal scrolling; single-header DOM check passed. Wider ledgers deliberately scroll.
+  Static app styling sweep clean. Required form fields are not styled as invalid before
+  user interaction. Changed TypeScript files were formatted without changing built behavior.
+- Read-only source inspection confirmed auth uses `VITE_SUPABASE_URL` and
+  `VITE_SUPABASE_ANON_KEY`, relative authenticated API paths, and same-process hosting;
+  no approved public target, external proxy/CORS setup or callback path was inferred.
+- Public Supabase/MDN documentation was read; no customer Supabase project, dashboard,
+  database, auth endpoint, deployment API or management service was contacted. No `.env`
+  files were read, no actual credential values were obtained/disclosed and no old-project
+  file was changed. Live auth/API/posting remain disabled under the user's instruction.
+
+Limitations: browser storage is a local demo mechanism, not multi-user transaction
+isolation or production authorization. No actual backend, installed authority, payments,
+recovery/restore, billing, monitoring, deployment or signed-in pilot has been verified.

@@ -9,7 +9,7 @@ const invoiceView = (label: string): MenuEntry => ({ label, action: 'invoice' })
 const section = (label: string): MenuEntry => ({ label, section: label });
 export const appMenus: Record<string, MenuEntry[]> = {
   File: [{ label: 'New sample invoice', action: 'new' }, { label: 'Save local draft', action: 'save' }, { label: 'Restore local draft', action: 'restore' }, { label: 'Print preview', action: 'print' }],
-  Masters: [{ label: 'Items', children: [{ label: 'Item catalogue', action: 'catalogue' }, ...pages('Categories', 'Units of measure')] }, ...pages('Customers', 'Suppliers', 'Accounts', 'Branches & locations')],
+  Masters: [{ label: 'Items', children: [{ label: 'Item catalogue', action: 'catalogue' }, ...pages('Product management', 'Categories', 'Units of measure')] }, ...pages('Customers', 'Suppliers', 'Accounts', 'Branches & locations')],
   Transactions: [
     { label: 'Purchase', children: [
       { label: 'Enquiries', children: pages('New purchase enquiry', 'Purchase enquiries') },
@@ -20,16 +20,16 @@ export const appMenus: Record<string, MenuEntry[]> = {
       { label: 'Returns', children: pages('New purchase return', 'Purchase returns') },
       { label: 'Purchase rate differences', children: pages('New purchase rate difference', 'Purchase rate differences') },
     ] },
-    { label: 'Sales', children: [...pages('Sales quotations', 'Sales orders'), invoiceView('Sales invoice'), ...pages('Sales returns')] },
+    { label: 'Sales', children: [...pages('Sales quotations', 'Sales orders'), invoiceView('Sales invoice'), ...pages('Sales register', 'Sales returns', 'Demo till')] },
     { label: 'Inventory', children: [{ label: 'Item catalogue', action: 'catalogue' }, ...pages('Stock balances', 'Stock movements', 'Stock adjustments', 'Stock transfers')] },
     { label: 'Production', children: pages('Production orders', 'Material consumption') },
-    { label: 'Finance', children: [section('Bills payable'), section('Bills receivable'), section('Cash'), section('Cheques'), section('Post dated cheques'), section('Cheques [PDC]')] },
+    { label: 'Finance', children: [...pages('Account balances'),section('Bills payable'), section('Bills receivable'), section('Cash'), section('Cheques'), section('Post dated cheques'), section('Cheques [PDC]')] },
     { label: 'General', children: [section('Other info'), section('Allocations'), section('Notes')] },
     { label: 'Vouchers', children: pages('Purchase vouchers', 'New supplier invoice', 'Supplier invoices', 'Payment vouchers', 'Receipt vouchers', 'Journal vouchers') },
   ],
-  Reports: [section('Summary'), ...pages('Sales register', 'Purchase register', 'Inventory valuation', 'Customer statement', 'Supplier statement')],
-  Tools: [{ label: 'Keyboard shortcuts', action: 'help' }, { label: 'Restore local draft', action: 'restore' }],
-  Settings: [...pages('Store settings', 'Document settings'), { label: 'Prototype information', action: 'about' }],
+  Reports: [section('Summary'), ...pages('Demo reports'), ...pages('Sales register', 'Purchase register', 'Inventory valuation', 'Customer statement', 'Supplier statement')],
+  Tools: [...pages('Data & exports'), { label: 'Keyboard shortcuts', action: 'help' }, { label: 'Restore local draft', action: 'restore' }],
+  Settings: [...pages('Connection setup', 'SaaS readiness', 'Team & roles', 'Company settings', 'Session & access', 'Store settings', 'Document settings'), { label: 'Prototype information', action: 'about' }],
   Help: [{ label: 'Keyboard shortcuts', action: 'help' }, { label: 'About this prototype', action: 'about' }],
 };
 export function menuMarkup(entries: MenuEntry[], path = 'menu'): string {
