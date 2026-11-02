@@ -50,7 +50,7 @@ must not be mapped to checkout's `discount` until its semantics are reviewed.
 
 A future HTTP adapter must implement the catalog port after reviewing authentication,
 error handling and tenant boundaries. Do not import the old service unchanged:
-it imports a Supabase auth client. No Supabase dependency, credentials, HTTP transport,
+it imports a Supabase auth client. No Supabase dependency, credentials, default live HTTP transport,
 proxy configuration or live fallback exists in this project.
 
 ## Frontend-only expansion (2 November 2026)
@@ -101,3 +101,13 @@ requests. All sample registers and item metadata use the selected fixture scope.
 No live membership/auth/role contract was inferred. Phase 2 must inspect the actual
 organization/store/session/staff lifecycle and access checks before an HTTP adapter or
 production sign-in is enabled. Unknown APIs stay unknown. See `SAAS_PHASE_PLAN.md`.
+
+
+## Phase 2 audit and inert read adapter
+
+See `PHASE_2_BACKEND_CONTRACT_AUDIT.md` for verified session, organization/store,
+staff, role, error, capability and domain-route evidence, plus explicit integration gaps.
+The prototype still uses sample services exclusively. The new `src/integration/` layer
+is disabled by default, accepts only injected transport/session ports, and is not imported
+by the app. Only fake-transport tests enable it. No live configuration or SDK was added.
+This layer has no checkout, payment, receiving, voucher or other write method.

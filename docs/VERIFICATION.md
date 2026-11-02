@@ -72,3 +72,28 @@ implemented or verified. No authentication/backend/database connection exists.
   live roles or resource ownership. Those are explicit later-phase release gates.
 
 Roadmap: `SAAS_PHASE_PLAN.md`. Next: Phase 2 source-backed session/API compatibility audit.
+
+
+## Phase 2: source audit and disabled read adapter
+
+Status: local audit/adapter preparation complete. No live integration is enabled.
+
+- TypeScript/Vite production build passed; all 22 tests passed, including 13 new fake-
+  transport adapter tests. They cover disabled/no-credential behavior, exact GET query
+  mapping, null stock, incorrect store/demo identity, backend's 100-row limit, missing/
+  mismatched sessions, sanitized provider/HTTP failures, identity changes before and
+  after requests, malformed/wrong-store/contradictory responses, startup readiness,
+  two capability contracts, abort/network behavior, disable-during-session and invalid
+  HTTP status. No automatic retries or fake successful empty reads.
+- Static route extraction captured 210 literal declarations. SHA-256 fingerprints of
+  35 reviewed source files were rechecked unchanged during the audit. The pre-existing
+  modification to source `HARDWARE_CURRENT.md` was not changed by this task.
+- Running UI/sample services were not changed. Built application asset hashes remain
+  unchanged from Phase 1 (`index-DUlMEEAe.js`, `index-K8unNfBn.css`); integration modules
+  are not imported into the runtime app. No repeat browser run was needed for this
+  non-visual change. Adapter requests in tests use injected in-memory transport only.
+- Original OmniPOS files, secrets/environment files, Supabase, SQL and deployments
+  were not modified or operated. Source code and local tests do not prove deployed
+  authentication, permissions, membership, database isolation or feature availability.
+
+See `PHASE_2_BACKEND_CONTRACT_AUDIT.md` for the contract matrix and precise open gates.

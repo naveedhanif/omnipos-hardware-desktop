@@ -18,6 +18,11 @@ Open the localhost URL printed by Vite. `npm run build` checks TypeScript and bu
 The app is moving toward a multi-tenant Hardware SaaS product. See the
 [phased delivery plan](docs/SAAS_PHASE_PLAN.md) and its release gates.
 Phase 1 introduces a **sample** tenant-aware frontend, not production authorization.
+Phase 2 adds the [backend/session audit](docs/PHASE_2_BACKEND_CONTRACT_AUDIT.md),
+[source route inventory](docs/HARDWARE_ROUTE_INVENTORY.json), and a disabled read-adapter
+layer tested with fake responses. The app still uses sample data and has no live transport.
+The existing verified startup contract returns one organization per authenticated profile;
+production multi-company membership must not be inferred from the demo switcher.
 
 ## Try it
 
@@ -67,7 +72,7 @@ For future updates from this project folder:
 ```sh
 cd '/Users/naveedhanif/Codex projects/omnipos-hardware-desktop'
 git status --short --branch
-git add .gitignore package.json package-lock.json tsconfig.json index.html src docs tests README.md .hallmark
+git add .gitignore package.json package-lock.json tsconfig.json index.html src docs tests scripts README.md .hallmark
 git commit -m "Update Hardware frontend prototype"
 git push origin main
 ```

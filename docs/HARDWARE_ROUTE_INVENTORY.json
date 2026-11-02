@@ -1,0 +1,1513 @@
+{
+  "sourceCommit": "b1e70d8dc52cb980a9c6cbf056ac24d0bb794930",
+  "scope": "Static literal declarations in Hardware routers, shared auth/startup and staff administration. Not a live or exhaustive dynamic route/security audit.",
+  "filesSha256": {
+    "server.ts": "e6d5500404560d55fd363b894f3c54f5768db442829f0912b5b9d501e113e568",
+    "routes/hardware/refund.ts": "4586af9fd1e311c05786f5b3e48fed009b98c2d3847a304481aaae27855fae20",
+    "routes/hardware/suppliers.ts": "27106685e89317754455ae8a35c53eb9d9a7327d4ad2a08481749e72800271d2",
+    "routes/hardware/categories.ts": "11e4931cd91a97450032c1b2679b2ebb4e800df62ee22798c6c8aa67a4c77c82",
+    "routes/hardware/products.ts": "a8413bd84bfb94474ed7911b23e5d791dcebde4f84b5ae261ef17848e9e3d8a8",
+    "routes/hardware/inventory.ts": "0e019e9924b5b7b49a910af4926ebb59c01d407c4d6b7c51779aef1ba8adbb0a",
+    "routes/hardware/sales.ts": "307f5cdb5104d3c419170cfd1e78195325d4cf5bc6203cb0c1eb5441fa43a62c",
+    "routes/hardware/trade.ts": "3b592a6588df2edf6504f12857ae518e869a959c3bc32c69832c2ed8f90a9129",
+    "routes/hardware/till.ts": "950ef86204f79ec2aa00a8f409fb890e8b710e1fee703c330b2fb97466e3af0a",
+    "routes/hardware/customers.ts": "3bf54a44a38ea4d2d8983c7fb8e1efaaf3952a770ce3357ba39005f67a93236f",
+    "routes/hardware/customerEngagement.ts": "97dd504ecaddf305455cbe8e9f8baf175897d38b6f7db622b3cc67f620f028f1",
+    "routes/hardware/customerProfileData.ts": "e1ec8fdcf87886caa21085a9b5c928372b7435ad4ba708c466be87b9447ea60c",
+    "routes/hardware/customerCore.ts": "86566be3c4c75abab6e929c73a9242c4b9cc446add0804300bebec0278506266",
+    "routes/hardware/customerCommercial.ts": "6964251c0f3d70b3060b06af32700a1505f6cc9051e5ca5842b6ebc1086986d7",
+    "routes/hardware/customerSupportLinks.ts": "f33f5e27a4cfbbefaaf678105c6f25c338214f61d1f55799dfc1bf7dff8fa882",
+    "routes/hardware/customerLoyaltyRead.ts": "53846dddecbef550ceeb5aec99b9712fddd465d30f3c7c2bb7dd335485eb70e5",
+    "routes/hardware/customerLoyaltyMutations.ts": "df8f03c4aa5cdff03f5d0c0528036fee6b7f31d644b9f634d8b0d7f67abd3e2e",
+    "routes/hardware/purchaseOrders.ts": "684e7f747aba68c3becf78fe5834cdbba138f9a4904bf7d4c67dd4b82db6e257",
+    "routes/hardware/goodsReceipts.ts": "b5e2210ece6d981d1f1b5c05177b2540f175dca3efb2104adf3d1c8760bb2372",
+    "routes/hardware/purchaseVouchers.ts": "07d30bf46497c0fa840e1e16abfe9b3fc37b3368c518e8d4b2d90337cd08b76b",
+    "routes/hardware/supplierInvoices.ts": "8a034915ffa06f646a781fc09e2e4d98c60f358568cbe9a1e4c6b895a0e7d53d",
+    "routes/hardware/supplierRfqs.ts": "4dc31bf8fd0f0c29a14a231d17d6a6eb92479b1788cbf7adcc9cc09cd7881d6a",
+    "routes/hardware/supplierReturns.ts": "5455709b0d4598591091d4e4d41c0af0b181df8d229e6a52ad375f9a222c2699",
+    "src/contexts/AppContext.tsx": "7d82bc6378d729f39a0a2662375ab34e28b593d67d89b405a483f9d238592a08",
+    "src/lib/appSessionLifecycle.ts": "449d6e66fda0e7aaf405f557a9a4371343ca9d2e83636afa22137e8d7a576c86",
+    "src/contexts/QueryIdentityBoundary.tsx": "6085bce0420e65bd12b7d3e5fd0d38c345645451245aa52f4c24d5c84b969e91",
+    "src/components/auth/AuthScreen.tsx": "5767c47e83ceac56bc5ac412fb4ce9e77769f4a581b3015d3d4d717b0bd081db",
+    "src/components/shared/StaffSwitcherModal.tsx": "8baedc865866e09d54b4d3a01c82f767b0d509a4e2bea67ba92bea24f873ab27",
+    "src/components/layout/AdminLayout.tsx": "1443c512ea64e59bf38d8f3867d051b946e1ec0e4127a2f5c48c5e1d7b366bdb",
+    "src/services/hardwareService.ts": "071d5084910a44fa7cfef6db7c3a205be8e96b82e9e5f32af089d0030c294381",
+    "src/services/coreService.ts": "e720ef07257fb5ca5497d490d47706415348227e532ab54722ca60be751fac14",
+    "src/types/index.ts": "d27010a65b249e44db0cc6217c8774144849b4678c9b918a37cca10f67fcd79f",
+    "routes/hardware/purchaseReadGate.ts": "f9c6132039dfd4e7e7a7c71397d42041ba9d8a5313d59b8f12e4f1422821f714",
+    "src/lib/hardwarePermissions.ts": "1e8e48c8d5f0b617d513f655dbb9838fa316b49e73aa04ddef35b921d5b91d48",
+    "src/lib/hardwareProductsRuntime.ts": "f74e67b61ad2bab1ebfd20e2b23dcd019af2c9c247951fa754fb727c88359130"
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/api/admin/create-staff",
+      "source": "server.ts",
+      "line": 328,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/admin/update-staff",
+      "source": "server.ts",
+      "line": 418,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/pin-setup-status",
+      "source": "server.ts",
+      "line": 587,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/verify-manager-pin",
+      "source": "server.ts",
+      "line": 686,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/verify-pin",
+      "source": "server.ts",
+      "line": 499,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/approval-rules",
+      "source": "server.ts",
+      "line": 5941,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/approval-rules",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 580,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/approval-rules",
+      "source": "server.ts",
+      "line": 5863,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/bootstrap",
+      "source": "server.ts",
+      "line": 3655,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/capabilities",
+      "source": "server.ts",
+      "line": 4898,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/categories",
+      "source": "routes/hardware/categories.ts",
+      "line": 19,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/categories",
+      "source": "routes/hardware/categories.ts",
+      "line": 102,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/categories/:id",
+      "source": "routes/hardware/categories.ts",
+      "line": 172,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/categories/summary",
+      "source": "routes/hardware/categories.ts",
+      "line": 50,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/checkout",
+      "source": "server.ts",
+      "line": 6881,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/claim-resolutions",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 115,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/claim-resolutions",
+      "source": "server.ts",
+      "line": 3976,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers",
+      "source": "routes/hardware/customers.ts",
+      "line": 16,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers",
+      "source": "routes/hardware/customerCore.ts",
+      "line": 88,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id",
+      "source": "routes/hardware/customers.ts",
+      "line": 195,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/customers/:id",
+      "source": "routes/hardware/customerCore.ts",
+      "line": 154,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/activity",
+      "source": "routes/hardware/customers.ts",
+      "line": 685,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/addresses",
+      "source": "routes/hardware/customers.ts",
+      "line": 670,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/addresses",
+      "source": "routes/hardware/customerProfileData.ts",
+      "line": 73,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/customers/:id/addresses/:addressId",
+      "source": "routes/hardware/customerProfileData.ts",
+      "line": 165,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/customers/:id/addresses/:addressId",
+      "source": "routes/hardware/customerProfileData.ts",
+      "line": 109,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/hardware/customers/:id/addresses/:addressId/default",
+      "source": "routes/hardware/customerProfileData.ts",
+      "line": 145,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/communications",
+      "source": "routes/hardware/customers.ts",
+      "line": 710,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/communications",
+      "source": "routes/hardware/customerEngagement.ts",
+      "line": 48,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/loyalty",
+      "source": "routes/hardware/customerLoyaltyRead.ts",
+      "line": 16,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/loyalty/adjust",
+      "source": "routes/hardware/customerLoyaltyMutations.ts",
+      "line": 237,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/loyalty/reconcile",
+      "source": "routes/hardware/customerLoyaltyMutations.ts",
+      "line": 16,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/notes",
+      "source": "routes/hardware/customers.ts",
+      "line": 630,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/notes",
+      "source": "routes/hardware/customerProfileData.ts",
+      "line": 16,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/opportunities",
+      "source": "routes/hardware/customerCommercial.ts",
+      "line": 92,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/opportunities",
+      "source": "routes/hardware/customerCommercial.ts",
+      "line": 129,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/customers/:id/opportunities/:oppId",
+      "source": "routes/hardware/customerCommercial.ts",
+      "line": 196,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/customers/:id/opportunities/:oppId",
+      "source": "routes/hardware/customerCommercial.ts",
+      "line": 160,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/overview",
+      "source": "routes/hardware/customers.ts",
+      "line": 319,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/possible-duplicates",
+      "source": "routes/hardware/customers.ts",
+      "line": 229,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/quotes",
+      "source": "routes/hardware/customerCommercial.ts",
+      "line": 49,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/refunds",
+      "source": "routes/hardware/customers.ts",
+      "line": 575,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/sales",
+      "source": "routes/hardware/customers.ts",
+      "line": 509,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/tasks",
+      "source": "routes/hardware/customers.ts",
+      "line": 754,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/tasks",
+      "source": "routes/hardware/customerEngagement.ts",
+      "line": 89,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/customers/:id/trade-account",
+      "source": "routes/hardware/customerSupportLinks.ts",
+      "line": 48,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/:id/trade-account",
+      "source": "routes/hardware/customerSupportLinks.ts",
+      "line": 81,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/customers/:id/trade-account/:linkId",
+      "source": "routes/hardware/customerSupportLinks.ts",
+      "line": 129,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/check-duplicate",
+      "source": "routes/hardware/customerCore.ts",
+      "line": 16,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/customers/merge",
+      "source": "server.ts",
+      "line": 8656,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/goods-receipts",
+      "source": "routes/hardware/goodsReceipts.ts",
+      "line": 25,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/goods-receipts/:id",
+      "source": "routes/hardware/goodsReceipts.ts",
+      "line": 118,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/import/commit",
+      "source": "routes/hardware/products.ts",
+      "line": 1386,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/import/commit",
+      "source": "server.ts",
+      "line": 6400,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/import/preview",
+      "source": "routes/hardware/products.ts",
+      "line": 1211,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/inventory/balances",
+      "source": "routes/hardware/inventory.ts",
+      "line": 165,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/inventory/location-status",
+      "source": "routes/hardware/inventory.ts",
+      "line": 420,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/inventory/movements",
+      "source": "routes/hardware/inventory.ts",
+      "line": 300,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/inventory/post-stock",
+      "source": "server.ts",
+      "line": 6563,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/inventory/post-stock-bulk",
+      "source": "server.ts",
+      "line": 6610,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/inventory/repair-location",
+      "source": "routes/hardware/inventory.ts",
+      "line": 458,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/inventory/summary",
+      "source": "routes/hardware/inventory.ts",
+      "line": 46,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/payroll-estimates",
+      "source": "server.ts",
+      "line": 9843,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/payroll/status",
+      "source": "server.ts",
+      "line": 9077,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/product-units",
+      "source": "routes/hardware/products.ts",
+      "line": 452,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/product-units",
+      "source": "routes/hardware/products.ts",
+      "line": 508,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/products",
+      "source": "routes/hardware/products.ts",
+      "line": 27,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/products",
+      "source": "routes/hardware/products.ts",
+      "line": 584,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/products/:id",
+      "source": "routes/hardware/products.ts",
+      "line": 545,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/products/:id",
+      "source": "routes/hardware/products.ts",
+      "line": 672,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/products/batch-lookup",
+      "source": "routes/hardware/products.ts",
+      "line": 377,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/products/bulk",
+      "source": "routes/hardware/products.ts",
+      "line": 785,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/products/check-uniqueness",
+      "source": "routes/hardware/products.ts",
+      "line": 301,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/products/picker",
+      "source": "routes/hardware/products.ts",
+      "line": 257,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/products/price-update/commit",
+      "source": "routes/hardware/products.ts",
+      "line": 1058,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/products/price-update/preview",
+      "source": "routes/hardware/products.ts",
+      "line": 850,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/purchase-orders",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 32,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders",
+      "source": "server.ts",
+      "line": 4017,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/purchase-orders/:id",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 210,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/purchase-orders/:id",
+      "source": "server.ts",
+      "line": 4374,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/approve",
+      "source": "server.ts",
+      "line": 5972,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/follow-up",
+      "source": "server.ts",
+      "line": 5412,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/receive",
+      "source": "server.ts",
+      "line": 5021,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/recurring",
+      "source": "server.ts",
+      "line": 5463,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/reject",
+      "source": "server.ts",
+      "line": 6098,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/restore-sources",
+      "source": "server.ts",
+      "line": 6169,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/purchase-orders/:id/revisions",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 428,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/revisions/:revision_id/restore",
+      "source": "server.ts",
+      "line": 4704,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/send",
+      "source": "server.ts",
+      "line": 5289,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/:id/split",
+      "source": "server.ts",
+      "line": 4243,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-orders/consolidate",
+      "source": "server.ts",
+      "line": 4123,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/purchase-orders/suggestions",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 144,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/purchase-vouchers",
+      "source": "routes/hardware/purchaseVouchers.ts",
+      "line": 93,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-vouchers",
+      "source": "routes/hardware/purchaseVouchers.ts",
+      "line": 114,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/purchase-vouchers/direct",
+      "source": "routes/hardware/purchaseVouchers.ts",
+      "line": 67,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/quotes",
+      "source": "server.ts",
+      "line": 8863,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/quotes/:quoteId",
+      "source": "server.ts",
+      "line": 8807,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/quotes/:quoteId",
+      "source": "server.ts",
+      "line": 8966,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/hardware/quotes/:quoteId/status",
+      "source": "server.ts",
+      "line": 9043,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/receive-route-health",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 508,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/recurring-purchase-orders",
+      "source": "routes/hardware/purchaseOrders.ts",
+      "line": 512,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/recurring-purchase-orders/:id",
+      "source": "server.ts",
+      "line": 5529,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/recurring-purchase-orders/:id/generate",
+      "source": "server.ts",
+      "line": 5559,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/refund",
+      "source": "routes/hardware/refund.ts",
+      "line": 170,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/sales",
+      "source": "routes/hardware/sales.ts",
+      "line": 34,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/sales/:id",
+      "source": "routes/hardware/sales.ts",
+      "line": 1212,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/sales/:id/invoice",
+      "source": "routes/hardware/sales.ts",
+      "line": 868,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/sales/:id/receipt",
+      "source": "routes/hardware/sales.ts",
+      "line": 1342,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/sales/invoices",
+      "source": "routes/hardware/sales.ts",
+      "line": 583,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/sales/reports/negotiated-pricing",
+      "source": "routes/hardware/sales.ts",
+      "line": 350,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/schema-test",
+      "source": "server.ts",
+      "line": 8613,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/seed-defaults",
+      "source": "server.ts",
+      "line": 3872,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/store-capabilities",
+      "source": "server.ts",
+      "line": 6817,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 331,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-invoices",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 684,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices/:id",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 681,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-invoices/:id/receive-direct",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 457,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-invoices/:id/validate-match",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 871,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices/capability",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 213,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices/capability/status",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 211,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-invoices/direct",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 411,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices/eligible-evidence",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 216,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices/reports/rate-differences",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 553,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-invoices/status",
+      "source": "routes/hardware/supplierInvoices.ts",
+      "line": 212,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-returns",
+      "source": "routes/hardware/supplierReturns.ts",
+      "line": 246,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-returns/:id",
+      "source": "routes/hardware/supplierReturns.ts",
+      "line": 432,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-returns/:id/post",
+      "source": "routes/hardware/supplierReturns.ts",
+      "line": 191,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-returns/:id/submit",
+      "source": "routes/hardware/supplierReturns.ts",
+      "line": 173,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-returns/drafts",
+      "source": "routes/hardware/supplierReturns.ts",
+      "line": 129,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-returns/sources",
+      "source": "routes/hardware/supplierReturns.ts",
+      "line": 344,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-rfqs",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 67,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 128,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/supplier-rfqs/:id",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 97,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/hardware/supplier-rfqs/:id",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 163,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs/:id/accept",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 269,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs/:id/cancel",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 339,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs/:id/convert-to-purchase-order",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 371,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs/:id/mark-sent",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 199,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs/:id/record-quote",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 230,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/supplier-rfqs/:id/reject",
+      "source": "routes/hardware/supplierRfqs.ts",
+      "line": 301,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/suppliers",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 587,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 716,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/suppliers/:id",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 782,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 887,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/addresses",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1006,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/addresses/:addressId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1073,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id/addresses/:addressId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1041,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/contacts",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 920,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/contacts/:contactId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 979,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id/contacts/:contactId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 950,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/contracts",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1374,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/contracts/:contractId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1449,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id/contracts/:contractId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1417,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/documents",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1287,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/documents/:documentId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1347,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id/documents/:documentId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1318,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/price-lists",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1100,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/price-lists/:priceListId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1174,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id/price-lists/:priceListId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1142,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/suppliers/:id/products",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1555,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/products",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1201,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/products/:productId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1260,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/suppliers/:id/products/:productId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1231,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/suppliers/:id/recent-purchase-orders",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1601,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/:id/scorecards",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1476,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hardware/suppliers/:id/scorecards/:scorecardId",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 1528,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/suppliers/dashboard",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 244,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/suppliers/duplicate-check",
+      "source": "routes/hardware/suppliers.ts",
+      "line": 659,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/tasks",
+      "source": "routes/hardware/customers.ts",
+      "line": 802,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/hardware/tasks/:id",
+      "source": "routes/hardware/customerEngagement.ts",
+      "line": 128,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/till/active",
+      "source": "routes/hardware/till.ts",
+      "line": 68,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/till/cash-movements",
+      "source": "server.ts",
+      "line": 8160,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/till/close",
+      "source": "server.ts",
+      "line": 8306,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/till/no-sale",
+      "source": "server.ts",
+      "line": 8241,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/till/open",
+      "source": "server.ts",
+      "line": 8085,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/till/registers",
+      "source": "routes/hardware/till.ts",
+      "line": 48,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/till/reports",
+      "source": "routes/hardware/till.ts",
+      "line": 300,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/till/sessions",
+      "source": "routes/hardware/till.ts",
+      "line": 288,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/till/x-report",
+      "source": "routes/hardware/till.ts",
+      "line": 101,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/till/z-report",
+      "source": "routes/hardware/till.ts",
+      "line": 306,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/time-clock/clock-in",
+      "source": "server.ts",
+      "line": 9200,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/time-clock/clock-out",
+      "source": "server.ts",
+      "line": 9326,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/time-clock/current",
+      "source": "server.ts",
+      "line": 9171,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/time-clock/end-break",
+      "source": "server.ts",
+      "line": 9280,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/time-clock/shifts",
+      "source": "server.ts",
+      "line": 9395,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/time-clock/start-break",
+      "source": "server.ts",
+      "line": 9235,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/time-clock/status",
+      "source": "server.ts",
+      "line": 9122,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/trade/accounts",
+      "source": "routes/hardware/trade.ts",
+      "line": 196,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/trade/accounts",
+      "source": "routes/hardware/trade.ts",
+      "line": 296,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/trade/accounts/:id",
+      "source": "routes/hardware/trade.ts",
+      "line": 258,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hardware/trade/accounts/:id",
+      "source": "routes/hardware/trade.ts",
+      "line": 361,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/trade/accounts/:id/contacts",
+      "source": "routes/hardware/trade.ts",
+      "line": 793,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/trade/accounts/:id/ledger",
+      "source": "routes/hardware/trade.ts",
+      "line": 453,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/trade/accounts/:id/ledger-adjustment",
+      "source": "routes/hardware/trade.ts",
+      "line": 571,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/trade/accounts/:id/receive-pos-payment",
+      "source": "routes/hardware/trade.ts",
+      "line": 648,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/users",
+      "source": "routes/hardware/customers.ts",
+      "line": 847,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/vault/accounts",
+      "source": "server.ts",
+      "line": 9500,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/vault/accounts",
+      "source": "server.ts",
+      "line": 9516,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/vault/bank-deposit",
+      "source": "server.ts",
+      "line": 9649,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/vault/movements",
+      "source": "server.ts",
+      "line": 9550,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/vault/movements",
+      "source": "server.ts",
+      "line": 9572,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/vault/reconcile",
+      "source": "server.ts",
+      "line": 9697,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/vault/safe-drop/confirm",
+      "source": "server.ts",
+      "line": 9614,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/vault/status",
+      "source": "server.ts",
+      "line": 9423,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/vault/transfer-to-till",
+      "source": "server.ts",
+      "line": 9693,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/void",
+      "source": "server.ts",
+      "line": 8564,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hardware/wages",
+      "source": "server.ts",
+      "line": 9808,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/wages/:userId",
+      "source": "server.ts",
+      "line": 9773,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hardware/wages/schema-check",
+      "source": "server.ts",
+      "line": 9755,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    },
+    {
+      "method": "GET",
+      "path": "/api/startup-context",
+      "source": "server.ts",
+      "line": 608,
+      "review": "literal registration only; payload and authorization require endpoint-specific review"
+    }
+  ]
+}

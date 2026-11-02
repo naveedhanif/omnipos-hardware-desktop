@@ -58,6 +58,22 @@ Independent frontend work may continue while an external gate is documented.
 See `VERIFICATION.md` for current evidence. Phase 1 is complete as a **sample frontend
 foundation**; it cannot be described as production multi-tenant isolation.
 
+## Phase 2 implementation record
+
+Status: local source audit and disabled read-adapter preparation complete.
+
+- Verified actual account auth, startup profile/organization/store, staff PIN, role and
+  capability contracts. Recorded source-backed gaps instead of adding guessed endpoints.
+- Captured 210 literal route declarations with source locations and source-file hashes.
+- Added four read-only adapter methods with injected session/identity/transport ports,
+  strict response projections, scope checks and stale-identity rejection. Disabled by
+  default, not imported by the running app, and no live transport or provider installed.
+- Added adapter tests using fake responses. All backend, database and signed-in release
+  gates remain open. Phase 3 must respect the verified one-organization startup contract.
+
+See [Phase 2 audit](PHASE_2_BACKEND_CONTRACT_AUDIT.md), the machine-readable
+[route inventory](HARDWARE_ROUTE_INVENTORY.json), and `VERIFICATION.md`.
+
 ## Boundaries and external prerequisites
 
 All code changes stay in this repository. Current OmniPOS source inspection is read-only.
