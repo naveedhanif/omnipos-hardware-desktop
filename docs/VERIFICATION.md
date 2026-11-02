@@ -132,3 +132,40 @@ See `PHASE_2_BACKEND_CONTRACT_AUDIT.md` for the contract matrix and precise open
 Limitations: browser storage is a local demo mechanism, not multi-user transaction
 isolation or production authorization. No actual backend, installed authority, payments,
 recovery/restore, billing, monitoring, deployment or signed-in pilot has been verified.
+
+## Expanded local workflows (Phases 4–10 preparation)
+
+2 November 2026. All implementation remains in this standalone repository. No original
+OmniPOS files, secrets, live API/auth, Supabase or deployment were accessed or changed
+in this milestone.
+
+- `npm run check` passes: production TypeScript/Vite build and **48 passing Node tests**.
+  Added tests cover category/unit rename/archive guards, customer snapshots and contact
+  archive protection, quotation/order transitions and stable invoice conversion,
+  multi-line partial receipts with dispositions and replay checks, allocation reversal,
+  report paging/filter validation, same-scope snapshot restore/reference protection,
+  and scoped owner-managed tenant requirements drafts.
+- Headless local Chrome checks passed for category/product/customer creation;
+  quotation → accepted order → invoice → demo sale; multi-line partial receipt;
+  allocation reversal followed by full sale reversal; report filtering/reset;
+  snapshot download, preview and confirmed restore with restored stock; and tenant
+  requirements save/reload/download. Desktop and 390px layouts were checked; no
+  page errors or external requests were observed. Runs used isolated sample browser
+  contexts. These checks provide no live payment or backend evidence.
+- Desktop screenshots of partial purchasing, inventory report and tenant requirements
+  were inspected. Responsive report and invoice footer checks passed. The local styling
+  sweep reported no findings. Changed TypeScript was formatted with the TypeScript
+  printer and rechecked.
+- Added a GitHub Actions check using pinned official checkout/setup-node v7 commits
+  and Node 24. It installs the lockfile and runs `npm run check`; no secrets, posting
+  or deployment job. The workflow has not yet run on GitHub. Official action sources:
+  [checkout](https://github.com/actions/checkout) and
+  [setup-node](https://github.com/actions/setup-node). Public action tags were verified;
+  no customer project or Supabase endpoint was contacted.
+
+Remaining limits: production phases 3–10 remain partial/gated. No server-enforced tenant
+security, real provider sign-in, financial posting, RFQ/GRN/payable authority, partial
+sales refunds, billing/provisioning, monitoring, production recovery or pilot release
+is claimed. Snapshot restore is only for healthy local business storage and excludes
+team/settings, quotation/order documents and saved invoice drafts. Local report paging
+bounds displayed rows, not server reads. See the current progress matrix for details.

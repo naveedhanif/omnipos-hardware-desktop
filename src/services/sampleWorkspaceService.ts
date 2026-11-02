@@ -53,6 +53,7 @@ export function createSampleWorkspaceService(context: WorkspaceContext, data?: {
     read(): {
         customers: {
             name: string;
+            active?: boolean;
         }[];
     };
 }) {
@@ -67,7 +68,7 @@ export function createSampleWorkspaceService(context: WorkspaceContext, data?: {
         storeName: details.store.name,
         getCustomers(): string[] {
             if (data)
-                return [...data.read().customers.map(customer => customer.name), 'Walk-in customer'];
+                return [...data.read().customers.filter(customer => customer.active !== false).map(customer => customer.name), 'Walk-in customer'];
             return scope.organizationId === 'sample-organization-b' ? ['Harbour Site Services', 'Harbour Workshop', 'Walk-in customer'] : ['Al Noor Building Maintenance', 'Gulf Workshop Supplies', 'Walk-in customer'];
         },
         getRegister(name: string): SampleRegister {

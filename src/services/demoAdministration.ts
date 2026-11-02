@@ -12,7 +12,16 @@ export interface CompanySettings {
     documentPrefix: string;
     country: string;
 }
+export interface DemoTenantSetupDraft {
+    companyName: string;
+    contactEmail: string;
+    desiredStores: number;
+    currency: string;
+    requirements: string;
+    status: 'draft';
+}
 export interface DemoAdministration {
+    setupDraft?: DemoTenantSetupDraft;
     version: 1;
     organizationId: string;
     members: DemoMember[];
@@ -20,8 +29,12 @@ export interface DemoAdministration {
 }
 export type LocalStoragePort = Pick<Storage, 'getItem' | 'setItem'>;
 const roles: DemoRole[] = ['OWNER', 'ADMIN', 'MANAGER', 'CASHIER'];
-const clean = (value: string, max = 120) => { const text = value.trim(); if (!text || text.length > max)
-    throw new Error(`Enter a value between 1 and ${max} characters.`); return text; };
+const clean = (value: string, max = 120) => {
+    const text = value.trim();
+    if (!text || text.length > max)
+        throw new Error(`Enter a value between 1 and ${max} characters.`);
+    return text;
+};
 export function createDemoAdministration(context: WorkspaceContext, storage: LocalStoragePort) {
     assertDemoContext(context);
     const scope = { ...context }, details = workspaceDetails(scope);
@@ -40,11 +53,15 @@ export function createDemoAdministration(context: WorkspaceContext, storage: Loc
             value.members.some(m => typeof m.id !== 'string' || !/^[-\w]{1,80}$/.test(m.id) || typeof m.name !== 'string' || typeof m.email !== 'string' || typeof m.active !== 'boolean' || !roles.includes(m.role)) ||
             !value.members.some(m => m.role === 'OWNER' && m.active) || ['displayName', 'documentPrefix', 'country'].some(key => typeof (value.settings as unknown as Record<string, unknown>)[key] !== 'string'))
             throw new Error('Local company data is invalid. No changes were made.');
+        if (value.setupDraft && (value.setupDraft.status !== 'draft' || typeof value.setupDraft.companyName !== 'string' || typeof value.setupDraft.contactEmail !== 'string' || !Number.isInteger(value.setupDraft.desiredStores) || value.setupDraft.desiredStores < 1 || value.setupDraft.desiredStores > 100 || typeof value.setupDraft.currency !== 'string' || !/^[A-Z]{3}$/.test(value.setupDraft.currency) || typeof value.setupDraft.requirements !== 'string' || value.setupDraft.requirements.length > 2000))
+            throw new Error('Invalid local tenant setup draft.');
         return value;
     }
     function commit(value: DemoAdministration) { storage.setItem(key, JSON.stringify(value)); }
-    function requireAdmin() { if (!['Owner', 'Admin'].includes(details.organization.role))
-        throw new Error('This demo action requires the company owner or administrator.'); }
+    function requireAdmin() {
+        if (!['Owner', 'Admin'].includes(details.organization.role))
+            throw new Error('This demo action requires the company owner or administrator.');
+    }
     return {
         read, canManage: () => ['Owner', 'Admin'].includes(details.organization.role),
         addMember(input: {
@@ -77,6 +94,8 @@ export function createDemoAdministration(context: WorkspaceContext, storage: Loc
                 throw new Error('Keep at least one active company owner.');
             commit(value);
         },
+        saveSetupDraft(input: Omit<DemoTenantSetupDraft, 'status'>) { requireAdmin(); const value = read(), contactEmail = clean(input.contactEmail, 254).toLowerCase(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) || !Number.isInteger(input.desiredStores) || input.desiredStores < 1 || input.desiredStores > 100 || !/^[A-Z]{3}$/.test(input.currency) || input.requirements.length > 2000)
+            throw new Error('Enter a valid sample email, store count, currency code and requirements.'); value.setupDraft = { companyName: clean(input.companyName), contactEmail, desiredStores: input.desiredStores, currency: input.currency, requirements: input.requirements.trim(), status: 'draft' }; commit(value); },
         saveSettings(input: CompanySettings) { requireAdmin(); const value = read(); value.settings = { displayName: clean(input.displayName), documentPrefix: clean(input.documentPrefix, 12), country: clean(input.country, 80) }; commit(value); },
     };
 }

@@ -6,12 +6,12 @@ All implementation lives in this folder. It does not connect to OmniPOS or Supab
 ## Run
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
-Open the localhost URL printed by Vite. `npm run build` checks TypeScript and builds
-`dist/`; `npm test` verifies integration guards, tenant isolation, session states, local workflows and calculations.
+Use Node.js 24 or newer. Open the localhost URL printed by Vite. `npm run build` checks TypeScript and builds
+`dist/`; `npm test` verifies integration guards, tenant isolation, session states, local workflows and calculations. `npm run check` runs both build and tests. The GitHub Actions workflow runs this check on main pushes and pull requests; it does not deploy.
 
 ## SaaS roadmap
 
@@ -28,8 +28,8 @@ production multi-company membership must not be inferred from the demo switcher.
 
 See [implementation progress](docs/IMPLEMENTATION_PROGRESS.md) for working demo flows
 and remaining release gates. Product management, local contacts/stock adjustments,
-demo sales/tills/full reversals, single-line purchase/receipt/invoice drafts, account
-allocations, reports and CSV tools now share tenant-scoped browser data.
+demo sales/tills/full reversals, quotation/order conversion, multi-line purchasing and partial receipts, account
+allocations/reversals, customer statements, filtered paged reports and CSV/snapshot tools now share tenant-scoped browser data.
 
 Settings → Connection setup explains why live sign-in, API calls and posting remain
 disabled. The [separate frontend connection audit](docs/SEPARATE_FRONTEND_CONNECTION.md)
@@ -61,16 +61,14 @@ has been approved by inference. Use sample data only; this is not production Saa
   Returns, and Purchase rate differences. Each opens a new-document preview or register.
   Desktop menus support hover; keyboard Down/Up, Right/Left and Escape navigate the
   cascade. Small screens use stacked, tap-to-expand branches.
-  Menu register pages open additional document tabs with design previews.
-- New settlement entry fields and posting buttons are disabled by design. The
-  frontend is being reviewed before functions and backend integration are added.
+  Registers open additional document tabs; unsupported workflows remain labelled previews.
+- Live settlement/posting controls remain disabled. Local demo actions are labelled explicitly.
 - Save draft writes browser localStorage only. Restore saved draft is explicit.
 - Remove an item; Ctrl/Command Z outside text fields undoes the last add/remove.
 - Print produces a sample draft preview, explicitly marked as unposted.
 
-Fixtures are behind `HardwareCatalogService` in `src/services/`. No network adapter
-exists. The verified product contract subset and remaining backend gates are in
-[API_COMPATIBILITY.md](docs/API_COMPATIBILITY.md). Customer choices are local fixtures.
+Fixtures are behind `HardwareCatalogService` in `src/services/`. Live transport is disabled; integration adapters are tested using fake transport only. The verified product contract subset and remaining backend gates are in
+[API_COMPATIBILITY.md](docs/API_COMPATIBILITY.md). Customer choices are local sample contacts.
 Sample invoices, totals, discounts and charges are illustrative, not accounting authority.
 Storage is local to one browser origin; unsaved edits warn on leaving. Do not enter
 real customer or payment data. This is a browser prototype, not a packaged desktop app.
@@ -84,7 +82,7 @@ For future updates from this project folder:
 ```sh
 cd '/Users/naveedhanif/Codex projects/omnipos-hardware-desktop'
 git status --short --branch
-git add .gitignore package.json package-lock.json tsconfig.json index.html src docs tests scripts README.md .hallmark
+git add .github package.json package-lock.json src docs tests README.md
 git commit -m "Update Hardware frontend prototype"
 git push origin main
 ```

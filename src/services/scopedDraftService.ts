@@ -5,7 +5,7 @@ type DraftStorage = Pick<Storage, 'getItem' | 'setItem'>;
 export function draftStorageKey(context: WorkspaceContext): string {
     return `omnipos-hardware-prototype:draft:v2:${workspaceKey(context)}`;
 }
-function validateDraft(value: unknown, context: WorkspaceContext, catalogue: HardwareProduct[]): asserts value is InvoiceDraft {
+export function validateDraft(value: unknown, context: WorkspaceContext, catalogue: HardwareProduct[]): asserts value is InvoiceDraft {
     if (!value || typeof value !== 'object')
         throw new Error('Invalid sample draft.');
     const d = value as InvoiceDraft;

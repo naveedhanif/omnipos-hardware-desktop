@@ -1,0 +1,9 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { buildDemoReport, defaultReportQuery } from '../src/services/demoReports.ts';
+import { createDemoBusinessService } from '../src/services/demoBusinessService.ts';
+import { defaultContext } from '../src/workspace/context.ts';
+function setup() { const map = new Map<string, string>(), storage = { getItem: (k: string) => map.get(k) ?? null, setItem: (k: string, v: string) => { map.set(k, v); } }; return createDemoBusinessService(defaultContext, storage); }
+test('local report search and pagination are bounded and invalid date ranges are refused', () => { const b = setup(); for (let i = 0; i < 22; i++)
+    b.saveProduct({ name: `Extra ${i}`, sku: `EX-${i}`, cost: 1, price: 2, unit: 'pcs', decimal: false }); const r = buildDemoReport('Inventory valuation', b, defaultReportQuery); assert.equal(r.rows.length, 20); assert.equal(r.total, 30); assert.equal(buildDemoReport('Inventory valuation', b, { ...defaultReportQuery, page: 2 }).rows.length, 10); assert.equal(buildDemoReport('Inventory valuation', b, { ...defaultReportQuery, search: 'Extra 21' }).total, 1); assert.throws(() => buildDemoReport('Sales register', b, { ...defaultReportQuery, from: '2026-11-02', to: '2026-10-01' })); });
+test('same-store snapshot preview/restore validates scope and preserves product references', () => { const b = setup(), original = b.exportBackup(); b.adjustStock(b.listProducts()[0].id, 2, 'After snapshot'); assert.equal(b.previewBackup(original).products, 8); b.restoreBackup(original); assert.equal(b.listProducts()[0].stock_qty, 18); const wrong = JSON.parse(original); wrong.storeId = 'foreign'; assert.throws(() => b.restoreBackup(JSON.stringify(wrong))); b.saveProduct({ name: 'Added later', sku: 'LATER', cost: 1, price: 2, unit: 'pcs', decimal: false }); assert.throws(() => b.restoreBackup(original)); assert.equal(b.listProducts().length, 9); });

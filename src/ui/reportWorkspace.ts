@@ -1,0 +1,10 @@
+import type { DemoBusinessService } from '../services/demoBusinessService';
+import { buildDemoReport, demoReportNames, type DemoReportQuery } from '../services/demoReports';
+import { escapeHtml as esc } from './html';
+import { sampleTable } from './invoiceSections';
+export function reportWorkspace(name: string, service: DemoBusinessService, query: DemoReportQuery): string | null {
+    if (!demoReportNames.includes(name))
+        return null;
+    const report = buildDemoReport(name, service, query);
+    return `<div class="page-heading"><div><h1>${name}</h1><p>Filtered local sample records. These are not authoritative server reports.</p></div><button class="button" data-business-action="export-report">Export filtered CSV</button></div><form class="report-filters" data-report-filter><label>Search<input name="search" value="${esc(query.search)}" maxlength="160" placeholder="Reference, name or status"></label>${report.dated ? `<label>From<input name="from" type="date" value="${esc(query.from)}"></label><label>To<input name="to" type="date" value="${esc(query.to)}"></label>` : ''}<button class="button">Apply filters</button><button type="button" class="button" data-report-reset>Clear filters</button></form>${name === 'Supplier statement' ? '<p class="panel-description">These are unposted purchase orders and supplier invoice drafts. They do not establish a payable balance or an official supplier statement.</p>' : ''}${name === 'Sales register' ? '<p class="section-footnote">Full local reversals remain available in Transactions → Sales → Sales returns.</p>' : ''}${sampleTable(report.columns, report.rows, 'No local records match these filters.')}<div class="report-pagination"><span>${report.total} matching records / page ${report.page} of ${report.totalPages}</span><div><button class="button" data-report-page="${report.page - 1}" ${report.page === 1 ? 'disabled' : ''}>Previous</button><button class="button" data-report-page="${report.page + 1}" ${report.page === report.totalPages ? 'disabled' : ''}>Next</button></div></div>`;
+}

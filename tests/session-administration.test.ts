@@ -40,3 +40,17 @@ test('local tenant administration isolates companies, checks demo role and prote
     assert.throws(() => a.updateMember('demo-owner', { role: 'MANAGER', active: false }));
     assert.equal(a.read().members[0].active, true);
 });
+test('tenant setup draft stays local, company scoped and owner managed', () => {
+    const values = new Map<string, string>(), storage = { getItem: (k: string) => values.get(k) ?? null, setItem: (k: string, v: string) => { values.set(k, v); } };
+    const a = createDemoAdministration(defaultContext, storage), b = createDemoAdministration({ ...defaultContext, organizationId: 'sample-organization-b', storeId: 'sample-builders-store' }, storage);
+    const input = { companyName: 'Fixture company', contactEmail: 'OWNER@example.invalid', desiredStores: 3, currency: 'KWD', requirements: 'Two branches and a warehouse' };
+    a.saveSetupDraft(input);
+    assert.equal(a.read().setupDraft?.status, 'draft');
+    assert.equal(a.read().setupDraft?.contactEmail, 'owner@example.invalid');
+    assert.equal(b.read().setupDraft, undefined);
+    assert.throws(() => b.saveSetupDraft(input));
+    assert.throws(() => a.saveSetupDraft({ ...input, desiredStores: 0 }));
+    assert.throws(() => a.saveSetupDraft({ ...input, currency: 'USD$' }));
+    assert.equal(a.read().settings.documentPrefix, 'HW');
+    assert.equal(a.read().setupDraft?.desiredStores, 3);
+});

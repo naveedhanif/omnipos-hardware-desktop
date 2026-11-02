@@ -78,7 +78,7 @@ See [Phase 2 audit](PHASE_2_BACKEND_CONTRACT_AUDIT.md), the machine-readable
 
 The next local milestones now include demo session/administration, persistent scoped
 catalogue and contacts, sample sales/tills/reversals, purchase/receipt/invoice drafts,
-account allocation, reports, CSV tooling and a SaaS readiness screen. **None of Phases
+account allocation/reversal, filtered paged reports, guarded snapshot restore, CSV tooling and a SaaS readiness screen. Local purchasing now supports multi-line partial/disposition receipts; quotations/orders can progress to demo invoices. Tenant requirements can be saved without provisioning; CI is defined without deployment. **None of Phases
 3–10 is claimed production-complete.** See [the detailed progress matrix](IMPLEMENTATION_PROGRESS.md)
 for exact implemented scope and remaining work, including non-gated frontend refinements.
 
