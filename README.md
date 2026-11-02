@@ -13,7 +13,19 @@ npm run dev
 Open the localhost URL printed by Vite. `npm run build` checks TypeScript and builds
 `dist/`; `npm test` verifies search/pagination, sample-store isolation and calculations.
 
+## SaaS roadmap
+
+The app is moving toward a multi-tenant Hardware SaaS product. See the
+[phased delivery plan](docs/SAAS_PHASE_PLAN.md) and its release gates.
+Phase 1 introduces a **sample** tenant-aware frontend, not production authorization.
+
 ## Try it
+
+- Switch Company and Store in the header: Omni Hardware has two stores; Harbour
+  Builders has one. Catalogues, sample customer views and drafts follow the selection.
+- Unsaved drafts are kept separately in this page's memory while switching. Save/restore
+  uses browser keys scoped by company, store and demo user. Reload loses unsaved edits.
+- Legacy unscoped drafts are not automatically assigned to a company or restored.
 
 - Open Transactions or Masters menus; switch Sales invoice / Item catalogue tabs.
 - Search `drill`, `HW-1002` or barcode `629100000001`; press Enter to add the first match.

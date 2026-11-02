@@ -1,3 +1,5 @@
+import { assertDemoContext, workspaceDetails, type WorkspaceContext } from '../workspace/context.ts';
+import { productsForWorkspace } from './sampleHardwareService.ts';
 /** Local presentation fixtures only. These are NOT additional Hardware API contracts. */
 export interface SampleRegister {
   description: string;
@@ -46,21 +48,43 @@ const registers: Record<string, SampleRegister> = {
     rows: [],
   },
 };
-export const sampleWorkspaceService = {
+export function createSampleWorkspaceService(context: WorkspaceContext) {
+  assertDemoContext(context);
+  const scope = Object.freeze({ ...context });
+  const details = workspaceDetails(scope);
+  function assertProduct(productId: string) {
+    if (!productsForWorkspace(scope).some(p => p.id === productId)) throw new Error('Item is unavailable in this sample workspace.');
+  }
+  return {
+  storeName: details.store.name,
+  getCustomers(): string[] {
+    return scope.organizationId === 'sample-organization-b' ? ['Harbour Site Services', 'Harbour Workshop', 'Walk-in customer'] : ['Al Noor Building Maintenance', 'Gulf Workshop Supplies', 'Walk-in customer'];
+  },
   getRegister(name: string): SampleRegister {
-    return structuredClone(registers[name] ?? {
+    const result = structuredClone(registers[name] ?? {
       description: 'Frontend layout only. Data and workflow integration are deferred.',
       columns: ['Reference', 'Date', 'Description', 'Status'], rows: [],
     });
+    // Each fixture projection is created for this workspace; never mutate shared rows.
+    result.rows = result.rows.map(row => row.map(cell => {
+      if (cell === 'Main store cash') return `${details.store.name} cash`;
+      if (scope.organizationId !== 'sample-organization-b') return cell;
+      return cell.replaceAll('Al Noor Building Maintenance', 'Harbour Site Services').replaceAll('Gulf Workshop Supplies', 'Harbour Workshop').replaceAll('Gulf Industrial Supplies', 'Harbour Industrial Supply').replaceAll('Coastal Tools Trading', 'Harbour Tool Supply').replaceAll('SAMPLE-', 'HARBOUR-');
+    }));
+    return result;
   },
   getItemPresentation(productId: string) {
+    assertProduct(productId);
     // Supplemental sample UI metadata, deliberately separate from HardwareProduct.
-    const hasBatch = ['sample-product-4', 'sample-product-6'].includes(productId);
+    const hasBatch = ['4', '6'].includes(productId.split('-').at(-1)!);
     return { hasBatch, batch: hasBatch ? 'SAMPLE-B-026' : null, landedRate: null };
   },
   getItemHistory(productId: string) {
+    assertProduct(productId);
     return [
-      { reference: `SAMPLE-OPEN-${productId.split('-').at(-1)}`, date: '01 Nov 2026', type: 'Opening stock', note: 'Illustrative opening entry; current sample availability is unchanged.' },
+      { reference: `SAMPLE-OPEN-${scope.storeId}-${productId.split('-').at(-1)}`, date: '01 Nov 2026', type: 'Opening stock', note: 'Illustrative opening entry; current sample availability is unchanged.' },
     ];
   },
 };
+}
+export type SampleWorkspaceService = ReturnType<typeof createSampleWorkspaceService>;

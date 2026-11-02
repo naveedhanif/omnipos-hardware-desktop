@@ -1,5 +1,5 @@
 import { purchaseInvoiceOptions, purchaseVoucherPreview } from './purchaseVouchers';
-import { sampleWorkspaceService } from '../services/sampleWorkspaceService';
+import type { SampleWorkspaceService } from '../services/sampleWorkspaceService';
 import { sampleTable } from './invoiceSections';
 import { escapeHtml as esc } from './html';
 
@@ -42,8 +42,8 @@ function collectWorkspacePages(entries: MenuEntry[]): string[] {
 }
 export const workspacePages = new Set(Object.values(appMenus).flatMap(collectWorkspacePages));
 
-export function workspacePreview(name: string): string {
-  const voucher = purchaseVoucherPreview(name);
+export function workspacePreview(name: string, sampleWorkspaceService: SampleWorkspaceService): string {
+  const voucher = purchaseVoucherPreview(name, sampleWorkspaceService.storeName);
   if (voucher) return voucher;
   const noun = name.toLowerCase();
   const layouts: Record<string, string[]> = {
@@ -63,13 +63,13 @@ export function workspacePreview(name: string): string {
   if (name.startsWith('New ')) {
     const party = name.includes('purchase') || name.includes('supplier') || name.includes('receipt') ? 'Supplier' : 'Account';
     return `<div class="page-heading"><div><h1>${esc(name)}</h1><p>Document entry layout for design review.</p></div><span class="sample-label">Design preview</span></div>
-      <fieldset class="settlement-fields" disabled><legend>Document details (not connected)</legend><div class="settlement-inputs">${['Document reference', 'Date', party, 'Branch', 'Currency', 'External reference'].map(label => `<label><span>${label}</span><input type="${label === 'Date' ? 'date' : 'text'}" placeholder="${label === 'Currency' ? 'KWD' : 'Not entered'}"></label>`).join('')}</div></fieldset>
+      <fieldset class="settlement-fields" disabled><legend>Document details (not connected)</legend><div class="settlement-inputs">${['Document reference', 'Date', party, 'Branch', 'Currency', 'External reference'].map(label => `<label><span>${label}</span><input type="${label === 'Date' ? 'date' : 'text'}" placeholder="${label === 'Currency' ? 'KWD' : label === 'Branch' ? esc(sampleWorkspaceService.storeName) : 'Not entered'}"></label>`).join('')}</div></fieldset>
       ${sampleTable(['Product code', 'Product', 'Unit', 'Quantity', 'Unit rate', 'Amount'], [], 'No items entered. This document is a frontend layout preview.')}
       <div class="preview-boundary"><p>Document fields and business rules are provisional. Saving, approval, receiving and posting are deferred.</p><button class="button" disabled>Save document (not connected)</button></div>`;
   }
   return `<div class="page-heading"><div><h1>${esc(name)}</h1><p>Review the ${esc(noun)} layout in this frontend prototype.</p></div><span class="sample-label">Design preview</span></div>
     <section class="workspace-preview"><div class="preview-toolbar"><label class="preview-search"><span>Search ${esc(noun)}</span><input type="search" id="preview-search" placeholder="Filter visible sample rows…"></label><button class="button" disabled>New record (not connected)</button></div>
-    <div class="preview-filters"><label>Status<select disabled><option>All statuses</option></select></label><label>Branch<select disabled><option>Main store</option></select></label><span>Sample records only</span></div>
+    <div class="preview-filters"><label>Status<select disabled><option>All statuses</option></select></label><label>Branch<select disabled><option>${esc(sampleWorkspaceService.storeName)}</option></select></label><span>Sample records only</span></div>
     ${sampleTable(columns, rows, `No ${noun} sample records. The register layout is ready for review.`)}
     <div class="preview-boundary"><strong>Frontend layout only</strong><p>Creation, approval, posting and backend contracts for this workspace have not been connected. The menu does not indicate an available backend capability.</p></div></section>`;
 }

@@ -20,11 +20,11 @@ function field(label: string, placeholder = 'Not entered'): string {
   return `<label><span>${esc(label)}</span><input type="${label === 'Voucher date' ? 'date' : 'text'}" placeholder="${esc(placeholder)}"></label>`;
 }
 
-export function purchaseVoucherPreview(name: string): string | null {
+export function purchaseVoucherPreview(name: string, storeName: string): string | null {
   if (!(purchaseInvoiceOptions as readonly string[]).includes(name)) return null;
   const source = name.includes('against Orders') ? 'Purchase order' : name.includes('against Receipts') ? 'Goods receipt' : null;
   const variant = name.includes('[Import]') ? 'Import' : name.includes('[Excise]') ? 'Excise' : name.startsWith('Cash') ? 'Cash' : name.startsWith('Proforma') ? 'Proforma' : 'Standard';
-  const fields = [field('Voucher number', 'Not assigned'), field('Voucher date'), field('Supplier'), field('Branch', 'Main store'), field('Currency', 'KWD'), field('Supplier invoice number'), field('Payment mode', variant === 'Cash' ? 'Cash' : 'Not selected'), field('LPO / reference'), field('Remarks')];
+  const fields = [field('Voucher number', 'Not assigned'), field('Voucher date'), field('Supplier'), field('Branch', storeName), field('Currency', 'KWD'), field('Supplier invoice number'), field('Payment mode', variant === 'Cash' ? 'Cash' : 'Not selected'), field('LPO / reference'), field('Remarks')];
   if (source) fields.push(field(`${source} reference`, 'Not linked'));
   const extras = variant === 'Import' ? ['Import reference', 'Country of origin', 'Freight / duty reference'] : variant === 'Excise' ? ['Excise reference', 'Registration reference', 'Duty treatment'] : [];
   return `<div class="page-heading"><div><h1>${esc(name)}</h1><p>Purchase voucher layout for frontend review.</p></div><span class="sample-label">Design preview</span></div>

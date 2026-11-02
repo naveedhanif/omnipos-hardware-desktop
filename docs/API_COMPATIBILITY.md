@@ -87,3 +87,17 @@ The Invoices menu now follows the 11 voucher variants in the latest screenshot.
 Import, excise, cash, order/receipt matching and proforma fields are provisional;
 no API fields, tax treatment, receiving behavior or posting semantics are asserted.
 Previous supplier invoice previews are retained under Transactions → Vouchers.
+
+
+## Tenant-aware sample boundary (Phase 1)
+
+The sample catalog adapter is now created with a validated demo organization/store/user
+context. `getHardwareProducts(storeId, params, options)` retains the verified subset of
+the existing product port; its caller cannot read another sample store through the same
+adapter. This is demo validation, not an authentication or server authorization contract.
+Scoped draft envelopes are private frontend data and must never be submitted as checkout
+requests. All sample registers and item metadata use the selected fixture scope.
+
+No live membership/auth/role contract was inferred. Phase 2 must inspect the actual
+organization/store/session/staff lifecycle and access checks before an HTTP adapter or
+production sign-in is enabled. Unknown APIs stay unknown. See `SAAS_PHASE_PLAN.md`.

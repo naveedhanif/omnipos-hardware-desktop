@@ -1,5 +1,5 @@
 import type { InvoiceDraft } from '../services/contracts';
-import { sampleWorkspaceService } from '../services/sampleWorkspaceService';
+import type { SampleWorkspaceService } from '../services/sampleWorkspaceService';
 import { money, totals } from '../money';
 import { escapeHtml as esc } from './html';
 
@@ -34,7 +34,7 @@ function previewField(label: string, value = 'Not configured', wide = false): st
   return `<div class="preview-field${wide ? ' preview-field-wide' : ''}"><span>${label}</span><div>${esc(value)}</div></div>`;
 }
 
-export function supplementaryPanel(section: string, draft: InvoiceDraft): string | null {
+export function supplementaryPanel(section: string, draft: InvoiceDraft, sampleWorkspaceService: SampleWorkspaceService): string | null {
   if (section === 'Items' || section === 'Charges & deductions' || section === 'Notes') return null;
   const banner = '<span class="sample-label">Sample view</span>';
   let description = '', body = '';
@@ -46,7 +46,7 @@ export function supplementaryPanel(section: string, draft: InvoiceDraft): string
     }), 'Add invoice items to preview their batch details.');
   } else if (section === 'Other info') {
     description = 'Additional document information. These fields are presented for design review.';
-    body = `<div class="preview-fields">${previewField('Document reference', draft.document)}${previewField('Sales account', 'Mapping pending')}${previewField('Branch / location', 'Main store / Main stock')}${previewField('Sales executive', 'Sample operator')}${previewField('Customer reference', draft.reference || 'Not entered')}${previewField('Delivery address', 'Not entered')}${previewField('Transaction currency', 'KWD')}${previewField('Exchange rate', 'Not configured')}${previewField('Internal remarks', draft.remarks || 'Not entered', true)}</div>`;
+    body = `<div class="preview-fields">${previewField('Document reference', draft.document)}${previewField('Sales account', 'Mapping pending')}${previewField('Branch / location', sampleWorkspaceService.storeName)}${previewField('Sales executive', 'Sample operator')}${previewField('Customer reference', draft.reference || 'Not entered')}${previewField('Delivery address', 'Not entered')}${previewField('Transaction currency', 'KWD')}${previewField('Exchange rate', 'Not configured')}${previewField('Internal remarks', draft.remarks || 'Not entered', true)}</div>`;
   } else if (section === 'E-invoice') {
     description = 'Electronic invoice layout only. No tax authority or e-invoice provider is connected.';
     body = `<div class="integration-state"><strong>Not submitted</strong><p>The required provider, tax identifiers and submission workflow will be reviewed before integration.</p></div>

@@ -1,10 +1,10 @@
 import type { InvoiceDraft } from '../services/contracts';
-import { sampleWorkspaceService } from '../services/sampleWorkspaceService';
+import type { SampleWorkspaceService } from '../services/sampleWorkspaceService';
 import { money, totals } from '../money';
 import { escapeHtml as esc } from './html';
 import { sampleTable } from './invoiceSections';
 
-export function itemGrid(draft: InvoiceDraft, expandedHistory: string | null): string {
+export function itemGrid(draft: InvoiceDraft, expandedHistory: string | null, sampleWorkspaceService: SampleWorkspaceService): string {
   const headers = ['#', 'Product code', 'Product', 'Cost rate', 'Stock available', 'Is batch', 'History', 'SKU / unit', 'Quantity', 'Landed rate', 'Unit rate', 'Gross amount', 'Disc. %', 'Discount', 'Net amount', ''];
   const widths = [30, 90, 190, 74, 82, 54, 62, 58, 74, 80, 80, 90, 64, 80, 92, 30];
   const t = totals(draft.lines);

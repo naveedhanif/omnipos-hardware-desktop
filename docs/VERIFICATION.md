@@ -48,3 +48,27 @@ disabled posting, desktop submenu fit, direct-URL restoration, receipt-source/im
 layouts and mobile navigation to Proforma at 390px. Zero page errors or external
 requests observed. Menu and receipt/import screenshots inspected visually. Build,
 existing tests and static styling checks pass. No backend integration was performed.
+
+
+## Phase 1: tenant-aware sample foundation
+
+Status: sample frontend foundation complete; production multi-tenant security is NOT
+implemented or verified. No authentication/backend/database connection exists.
+
+- TypeScript/Vite build passed; nine Node tests passed, including seven new tenant
+  tests for membership tuples, bound catalog scope, tenant/branch draft separation,
+  corrupt/copied envelopes, legacy draft non-adoption, invalid lines/products,
+  scoped customer/history fixtures and invalid remembered context.
+- Headless Chrome exercised two companies and three stores: company/store-bound
+  catalogue/customer/register views; cleared search and undo on switching; preserved
+  unsaved drafts per workspace in page memory; distinct local save/reload/restore;
+  validated tab selection restore; mobile nested menus and voucher branch context.
+- Zero browser errors and non-local requests observed. Desktop and 390px mobile
+  screenshots inspected. Static app styling sweep clean. Existing invoice/purchase
+  previews remain functional; posting remains disabled.
+- Old unscoped v1 browser drafts are not migrated or assigned to a company. They are
+  left untouched but are no longer loaded by the scoped draft service.
+- Local tests validate demo behavior, not server authorization, database isolation,
+  live roles or resource ownership. Those are explicit later-phase release gates.
+
+Roadmap: `SAAS_PHASE_PLAN.md`. Next: Phase 2 source-backed session/API compatibility audit.

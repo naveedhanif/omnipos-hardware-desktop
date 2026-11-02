@@ -87,3 +87,11 @@
 .voucher-total{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;color:var(--muted);font-size:12px}.voucher-total strong{font-size:16px;color:var(--ink)}
 .voucher-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);padding:16px 0}
 @media(max-width:900px){.submenu:has(> button[data-action="workspace:Purchase Vouchers"]){min-width:0}.submenu button{white-space:normal}.voucher-review{flex-direction:column}.voucher-total{align-items:flex-start}.voucher-actions{flex-wrap:wrap;justify-content:flex-start}}
+/* Phase 1: explicit company/store context, with demo identity kept visible. */
+.workspace-switcher{margin-left:auto;display:flex;align-items:center;gap:16px;min-width:0}
+.workspace-switcher label{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);min-width:0}
+.workspace-switcher select{border:1px solid var(--line);height:32px;padding:4px 8px;background:var(--paper);font-size:12px;max-width:190px;min-width:0}
+.workspace-switcher .sample-label{white-space:nowrap}
+@media(max-width:1100px){.workspace-switcher{gap:8px}.workspace-switcher label{gap:4px}.workspace-switcher select{max-width:160px}.workspace-switcher .sample-label{display:none}}
+@media(max-width:720px){.app-header{height:auto;min-height:58px;flex-wrap:wrap;padding:12px 16px;gap:12px}.app-header .avatar{margin-left:auto;order:1}.brand{order:0}.workspace-switcher{order:2;flex-basis:100%;width:100%;margin:0;gap:12px}.workspace-switcher label{flex:1;flex-direction:column;align-items:stretch;gap:4px}.workspace-switcher select{width:100%;max-width:none}.menu{top:165px;max-height:calc(100dvh - 190px)}.statusbar{height:auto;min-height:31px;flex-wrap:wrap;padding:8px 12px;gap:4px 12px}.statusbar>span:nth-child(2){max-width:70%;overflow-wrap:anywhere}}
+@media print{.workspace-switcher{display:none!important}}
