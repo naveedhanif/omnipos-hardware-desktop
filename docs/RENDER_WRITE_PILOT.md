@@ -26,3 +26,13 @@ The owner designated Kuwait for one test cash sale. The desktop screen should us
 The reviewed checkout handler in backend commit `b1e70d8` requires a till session ID for cash. The active-till endpoint can return a demo fallback. The desktop must reject fallback results and verify that the till belongs to the selected store. Before enabling checkout, confirm the deployed handler enforces active operator permissions and that the atomic checkout operation validates till and product scope. The HTTP handler authenticates the caller and scopes the store to the organization, but that does not verify the installed database function's behavior.
 
 Keep the same submission reference for a single attempt. If the result is uncertain, stop and reconcile the invoice before another submission. The pilot passes when one invoice appears in the desktop register and matches the stock and till movements in the existing system.
+
+## Deployed checkout review — 3 November 2026
+
+Render shows `ba2c9418a834a2cc1d2a8ad6987359f550da7ff6` live for `omnipos-hardware-pilot`. The desktop till-check commit `e222def` has a successful Vercel status. Signed-in till verification is pending.
+
+At the live Render revision, `server.ts:163` reads the operator's `role` and `is_active` fields and returns the profile. The checkout handler at `server.ts:6945` checks the authentication result and the store's organization. It reaches checkout without an explicit active-operator or checkout-role check. This is an HTTP-layer gap. The deployed database function's internal protections and the configured checkout variant remain unverified.
+
+Before exposing the desktop POST route, the backend owner needs to enforce active-operator and approved checkout-role checks before any checkout RPC. Test that an inactive or unauthorized operator is refused with zero checkout RPC calls. Confirm that the installed checkout variant rejects a foreign or closed till and a product outside the selected store. Verify that replaying the same submission reference creates exactly one sale, stock movement and till entry. Use the confirmed Kuwait store ID for the pilot once these checks pass.
+
+Render deployment: https://dashboard.render.com/web/srv-d963t9urnols73coa13g/deploys
