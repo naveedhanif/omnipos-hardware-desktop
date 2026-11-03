@@ -133,3 +133,10 @@ The separate `/workspace.html` now includes owner/admin Goods receipts, manual s
 and pages, and expandable recorded receipt lines. Missing backend GRN capability is
 shown explicitly as unavailable. Receiving and posting stay disabled. No new settings
 or database change is requested. See [verified contract and deployment check](docs/GOODS_RECEIPTS_READ.md).
+
+## Supplier invoice read milestone
+
+The live-capable `/workspace.html` now includes owner/admin Supplier invoices with
+manual reference search/pages and recorded statuses/totals. AP feature/schema failures
+remain explicit; no payment balance or posting is enabled. The existing configuration
+is reused. See [contract and owner check](docs/SUPPLIER_INVOICES_READ.md).

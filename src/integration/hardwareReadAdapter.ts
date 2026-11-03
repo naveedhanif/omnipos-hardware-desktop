@@ -1,3 +1,4 @@
+import { decodeSupplierInvoicePage } from './supplierInvoiceRead.ts';
 import { decodeReceiptPage } from './receiptRead.ts';
 import { HardwareReadError, type ReadIdentity, type HardwareReadScope, type ProductReadQuery } from './contracts.ts';
 import { decodeInventoryPage } from './inventoryRead.ts';
@@ -153,6 +154,15 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
             if (q.search)
                 query.set('search', q.search);
             return decodeReceiptPage(await read(`/api/hardware/goods-receipts?${query}`, identity, options?.signal), scope, q.page);
+        },
+        async getHardwareSupplierInvoices(storeId: string, options?: ReadWindow & {
+            signal?: AbortSignal;
+        }) {
+            const identity = capture(), scope = scoped(identity, storeId);
+            const q = readWindow(options), query = new URLSearchParams({ storeId, page: String(q.page), limit: '10' });
+            if (q.search)
+                query.set('search', q.search);
+            return decodeSupplierInvoicePage(await read(`/api/hardware/supplier-invoices?${query}`, identity, options?.signal), scope, q.page);
         },
         async getHardwareStoreCapabilities(storeId: string, options?: {
             signal?: AbortSignal;

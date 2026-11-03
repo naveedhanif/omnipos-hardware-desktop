@@ -9,7 +9,7 @@ export function allowedReadPath(path: string): boolean {
         return false;
     if (url.pathname === '/api/startup-context')
         return !url.search;
-    if (!['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices', '/api/hardware/goods-receipts'].includes(url.pathname))
+    if (!['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices', '/api/hardware/goods-receipts', '/api/hardware/supplier-invoices'].includes(url.pathname))
         return false;
     const keys = [...url.searchParams.keys()];
     if (keys.length < 3 || keys.length > 4 || new Set(keys).size !== keys.length || !keys.every(k => ['storeId', 'page', 'limit', 'search'].includes(k)) || !uuid(url.searchParams.get('storeId')) || url.searchParams.get('limit') !== '10')

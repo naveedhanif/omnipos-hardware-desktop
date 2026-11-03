@@ -1,3 +1,4 @@
+import { uuid } from '../src/integration/decoders.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { hardwareTargets } from '../src/integration/connectionConfig.ts';
 import { allowedReadPath, limitedText } from '../src/integration/readBoundary.ts';
@@ -28,6 +29,14 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             method: 'GET', headers: { Authorization: input.authorization, Accept: 'application/json' },
             redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(upstreamReadTimeoutMs),
         });
+        if (!response.ok && response.status === 503 && new URL(input.path, hardwareTargets.apiOrigin).pathname === '/api/hardware/supplier-invoices' && response.headers.get('content-type')?.toLowerCase().includes('application/json')) {
+            // Preserve only two reviewed capability diagnostics, never upstream exception text.
+            const body = JSON.parse(await limitedText(response, 16384));
+            if (body && body.success === false && ['AP_FEATURE_DISABLED', 'AP_SCHEMA_UNAVAILABLE'].includes(body.code)) {
+                const safe = fail(503, body.code);
+                return { ...safe, body: JSON.stringify({ ...JSON.parse(safe.body), ...(uuid(body.correlationId) ? { correlationId: body.correlationId } : {}) }) };
+            }
+        }
         if (!response.ok)
             return fail([401, 403, 404, 429, 503].includes(response.status) ? response.status : 502, 'UPSTREAM_READ_REFUSED');
         if (!response.headers.get('content-type')?.toLowerCase().includes('application/json'))

@@ -2,7 +2,7 @@
 
 Started 2 November 2026. This standalone frontend will eventually reuse OmniPOS's
 existing Hardware backend and database only after compatibility and isolation review.
-The current app has no backend connection. A menu preview is not a completed workflow.
+The owner has confirmed sign-in and product reads through the existing backend; other live gates remain open. A menu preview is not a completed workflow.
 
 ## Product and tenancy model
 
@@ -82,7 +82,7 @@ account allocation/reversal, filtered paged reports, guarded snapshot restore, C
 3–10 is claimed production-complete.** See [the detailed progress matrix](IMPLEMENTATION_PROGRESS.md)
 for exact implemented scope and remaining work, including non-gated frontend refinements.
 
-Real sign-in/API/posting remain disabled under the user's latest instruction. The
+The historical local-only stages above are superseded for approved read-only sign-in/API browsing. Business posting remains disabled. The
 read-only [separate frontend connection audit](SEPARATE_FRONTEND_CONNECTION.md) lists
 source evidence and precise public configuration values required before any live wiring.
 No candidate deployment URL is treated as approved.
@@ -91,7 +91,7 @@ No candidate deployment URL is treated as approved.
 
 See [read-phase progress](READ_PHASE_PROGRESS.md): the owner confirms sign-in/startup/products. A
 reusable read-only workspace with scoped paging/search and fresh access checks is
-prepared locally; stock/invoice live verification remains open. None of this establishes full production phase
+prepared locally; stock, sales invoices, goods receipts and supplier invoices are prepared; their signed-in live verification remains open. None of this establishes full production phase
 completion or authorizes business writes.
 
 ## Boundaries and external prerequisites

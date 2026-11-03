@@ -1,3 +1,4 @@
+import type { SupplierInvoicePage } from './supplierInvoiceRead.ts';
 import type { ReceiptPage } from './receiptRead.ts';
 import type { ReadProductPage } from './contracts.ts';
 import type { InventoryPage } from './inventoryRead.ts';
@@ -14,4 +15,7 @@ export type ReadResult = {
 } | {
     kind: 'receipts';
     data: ReceiptPage;
+} | {
+    kind: 'supplierInvoices';
+    data: SupplierInvoicePage;
 };
