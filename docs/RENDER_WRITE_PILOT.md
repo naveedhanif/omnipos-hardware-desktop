@@ -18,3 +18,11 @@ The existing service submits LPO creation to POST /api/hardware/purchase-orders 
 For the first slice, verify a store-scoped supplier lookup and draft detail readback, confirm the allowed edit fields and require a server-side draft-state guard. Verify that an inactive or unauthorized operator cannot create or edit a draft. Exercise partial failure and repeated submission in QA before using business records.
 
 Sales use POST /api/hardware/checkout with a store, basket, tender and idempotency key. Till requirements, operator attribution and stock and payment effects must be checked for the chosen QA workflow. Compare the posted invoice and stock movement before progressing to additional tenders.
+
+## Kuwait desktop cash sale
+
+The owner designated Kuwait for one test cash sale. The desktop screen should use the signed-in store ID, one existing SKU at its current price, quantity one and exact cash. The operator should review the basket and total before submitting. A store label alone is insufficient for routing because labels can repeat across organizations.
+
+The reviewed checkout handler in backend commit `b1e70d8` requires a till session ID for cash. The active-till endpoint can return a demo fallback. The desktop must reject fallback results and verify that the till belongs to the selected store. Before enabling checkout, confirm the deployed handler enforces active operator permissions and that the atomic checkout operation validates till and product scope. The HTTP handler authenticates the caller and scopes the store to the organization, but that does not verify the installed database function's behavior.
+
+Keep the same submission reference for a single attempt. If the result is uncertain, stop and reconcile the invoice before another submission. The pilot passes when one invoice appears in the desktop register and matches the stock and till movements in the existing system.
