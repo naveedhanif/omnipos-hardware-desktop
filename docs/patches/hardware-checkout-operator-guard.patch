@@ -1,0 +1,14 @@
+--- a/server.ts
++++ b/server.ts
+@@ -6949,6 +6949,11 @@
+       const auth = await verifyCaller(req, supabaseAdmin);
+       if (auth.error) return res.status(auth.status!).json({ error: auth.error });
+ 
++      const checkoutRole = String(auth.profile?.role ?? '').trim().toLowerCase();
++      if (auth.profile?.is_active !== true || !['owner', 'admin', 'manager', 'cashier'].includes(checkoutRole)) {
++        return res.status(403).json({ error: "Checkout requires an active sales operator.", code: "HARDWARE_CHECKOUT_FORBIDDEN" });
++      }
++
+       const { storeId, basketItems, paymentType, tradeAccountId, customerId, idempotencyKey, tillSessionId, cashReceived, cardType, terminalReference, splitPayments, quoteId, taxRate = 0 } = req.body;
+       if (!storeId) return res.status(400).json({ error: "Missing storeId" });
+       if (!basketItems || !Array.isArray(basketItems) || basketItems.length === 0) {
