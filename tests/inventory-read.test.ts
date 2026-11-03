@@ -67,7 +67,7 @@ test('one stock read consumes the check and refuses another view, bad currency a
 });
 test('only stock-balance first-page GET passes the browser/server boundary; writes and other inventory routes stay blocked', async () => {
     assert.ok(allowedReadPath(path));
-    for (const p of [path.replace('page=1', 'page=2'), path + '&locationId=' + org, path.replace('/balances', '/movements'), path.replace('/balances', '/post-stock'), path + '&storeId=' + store])
+    for (const p of [path.replace('page=1', 'page=0'), path + '&locationId=' + org, path.replace('/balances', '/movements'), path.replace('/balances', '/post-stock'), path + '&storeId=' + store])
         assert.equal(allowedReadPath(p), false);
     let calls = 0;
     const input = { method: 'GET', path, authorization: 'Bearer fixture-token', apiOrigin: hardwareTargets.apiOrigin };

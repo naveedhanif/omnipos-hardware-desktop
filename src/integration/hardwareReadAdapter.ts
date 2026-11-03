@@ -1,6 +1,7 @@
 import { HardwareReadError, type ReadIdentity, type HardwareReadScope, type ProductReadQuery } from './contracts.ts';
 import { decodeInventoryPage } from './inventoryRead.ts';
 import { decodeInvoicePage } from './invoiceRead.ts';
+import { readWindow, type ReadWindow } from './readWindow.ts';
 import { uuid, record, decodeStartup, decodeProductPage, decodeReceivingCapabilities, decodeStoreCapabilities } from './decoders.ts';
 export interface ReadRequest {
     method: 'GET';
@@ -124,18 +125,24 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
             scoped(identity, storeId);
             return decodeReceivingCapabilities(await read(`/api/hardware/capabilities?${new URLSearchParams({ storeId })}`, identity, options?.signal));
         },
-        async getHardwareInventoryBalances(storeId: string, options?: {
+        async getHardwareInventoryBalances(storeId: string, options?: ReadWindow & {
             signal?: AbortSignal;
         }) {
             const identity = capture(), scope = scoped(identity, storeId);
-            return decodeInventoryPage(await read(`/api/hardware/inventory/balances?${new URLSearchParams({ storeId, page: '1', limit: '10' })}`, identity, options?.signal), scope);
+            const q = readWindow(options), query = new URLSearchParams({ storeId, page: String(q.page), limit: '10' });
+            if (q.search)
+                query.set('search', q.search);
+            return decodeInventoryPage(await read(`/api/hardware/inventory/balances?${query}`, identity, options?.signal), scope, q.page);
         },
-        async getHardwareInvoices(storeId: string, options?: {
+        async getHardwareInvoices(storeId: string, options?: ReadWindow & {
             signal?: AbortSignal;
         }) {
             const identity = capture();
             scoped(identity, storeId);
-            return decodeInvoicePage(await read(`/api/hardware/sales/invoices?${new URLSearchParams({ storeId, page: '1', limit: '10' })}`, identity, options?.signal));
+            const q = readWindow(options), query = new URLSearchParams({ storeId, page: String(q.page), limit: '10' });
+            if (q.search)
+                query.set('search', q.search);
+            return decodeInvoicePage(await read(`/api/hardware/sales/invoices?${query}`, identity, options?.signal), q.page);
         },
         async getHardwareStoreCapabilities(storeId: string, options?: {
             signal?: AbortSignal;

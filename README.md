@@ -29,6 +29,15 @@ See [current read-phase status](docs/READ_PHASE_PROGRESS.md) for deployed guard 
 The existing verified startup contract returns one organization per authenticated profile;
 production multi-company membership must not be inferred from the demo switcher.
 
+## Live read-only workspace
+
+The owner has confirmed existing sign-in, store selection and product reading through
+the deployed connection check. The next workspace is prepared at `/workspace.html`: a
+memory-only session, manual products/stock/invoice browsing, search and paging. See
+[read-only workspace](docs/LIVE_READ_ONLY_WORKSPACE.md) for deployment and limits. No
+additional Vercel variables or database changes are needed by this implementation.
+The main editable invoice application remains sample-only.
+
 ## Current local workflows
 
 See [implementation progress](docs/IMPLEMENTATION_PROGRESS.md) for working demo flows
@@ -39,7 +48,8 @@ allocations/reversals, customer statements, filtered paged reports and CSV/snaps
 Settings → Connection setup links to the isolated read-only connection check. The
 main workspace continues to use sample data, and transaction posting remains disabled. The [separate frontend connection audit](docs/SEPARATE_FRONTEND_CONNECTION.md)
 records verified source behavior and exact missing public configuration. No API endpoint
-has been approved by inference. Use sample data only; this is not production SaaS security.
+has been approved by inference. Use sample data only in the editable prototype; live
+reads stay isolated. Production SaaS security remains unverified.
 
 For the rechecked source findings, exact configuration names and private local setup,
 read [connection configuration](docs/CONNECTION_CONFIGURATION.md). The root
@@ -48,7 +58,8 @@ never copy the old application's environment file or enter server secrets here.
 The [implemented check](docs/READ_ONLY_CONNECTION_CHECK.md) uses these public values
 after deployment. It supports explicit existing-account sign-in, startup context and
 one selected products, stock-balances or owner/admin invoice page through four Vercel GET-only functions. No request runs merely on
-page load. Live verification has not been performed; transaction posting stays disabled.
+page load. The owner confirms the initial product read; new workspace and stock/invoice
+verification remain open. Transaction posting stays disabled.
 
 ## Try it
 

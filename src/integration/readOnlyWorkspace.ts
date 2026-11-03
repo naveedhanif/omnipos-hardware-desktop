@@ -1,0 +1,143 @@
+import { createHardwareReadAdapter } from './hardwareReadAdapter.ts';
+import { resolveHardwareScope, uuid } from './decoders.ts';
+import { HardwareReadError, type ReadIdentity, type StartupContext, type BackendStore } from './contracts.ts';
+import type { CheckPorts, CheckSession } from './connectionCheck.ts';
+import { readWindow, type ReadWindow } from './readWindow.ts';
+import type { ReadResult } from './readResult.ts';
+export type LiveView = ReadResult['kind'];
+export const workspaceLifetimeMs = 15 * 60000;
+export interface WorkspaceSummary {
+    company: string;
+    stores: BackendStore[];
+    storeId: string | null;
+    canReadInvoices: boolean;
+    expiresAt: number;
+}
+/** Memory-only, manual reads. No auth refresh, background fetch, storage, retries or writes. */
+export function createReadOnlyWorkspace(ports: CheckPorts) {
+    const now = ports.now ?? Date.now;
+    let revision = 0, session: CheckSession | null = null, startup: StartupContext | null = null, identity: ReadIdentity | null = null;
+    let request: AbortController | null = null, busy = false;
+    const adapter = createHardwareReadAdapter({ enabled: true, getIdentity: () => identity, getSession: async () => session && session.expiresAt > now() ? session : null, transport: ports.transport });
+    function clear() { ++revision; request?.abort(); request = null; session = null; startup = null; identity = null; busy = false; }
+    function active() {
+        if (!session || session.expiresAt <= now()) {
+            clear();
+            throw new Error('The read-only session ended. Sign in again.');
+        }
+    }
+    function current(attempt: number) {
+        if (attempt !== revision)
+            throw new Error('The workspace changed while reading.');
+        active();
+    }
+    function validateContext(context: StartupContext) {
+        if (!context.profile?.is_active || !context.organization || !context.stores.some(s => s.business_type === 'hardware'))
+            throw new Error('An active account with an existing Hardware store is required.');
+    }
+    function summary(): WorkspaceSummary | null {
+        if (!session)
+            return null;
+        if (session.expiresAt <= now()) {
+            clear();
+            return null;
+        }
+        if (!startup?.organization)
+            return null;
+        return structuredClone({ company: startup.organization.name, stores: startup.stores.filter(s => s.business_type === 'hardware'), storeId: identity?.storeId ?? null, canReadInvoices: ['owner', 'admin'].includes(startup.profile!.role.toLowerCase()), expiresAt: session.expiresAt });
+    }
+    return {
+        clear, summary,
+        async signIn(email: string, password: string, consent: boolean) {
+            clear();
+            if (!consent || !email.trim() || !password)
+                throw new Error('Approve read-only browsing and enter your existing account credentials.');
+            const attempt = revision;
+            request = new AbortController();
+            busy = true;
+            try {
+                const value = await ports.signIn(email.trim(), password, request.signal);
+                if (attempt !== revision)
+                    throw new Error('The workspace check ended.');
+                if (!uuid(value.userId) || typeof value.accessToken !== 'string' || !value.accessToken || /\s/.test(value.accessToken) || !Number.isFinite(value.expiresAt) || value.expiresAt <= now())
+                    throw new Error('A valid session was not returned.');
+                session = { ...value, expiresAt: Math.min(value.expiresAt, now() + workspaceLifetimeMs) };
+                identity = { userId: session.userId, revision };
+                ports.onAuthenticated?.();
+                const context = await adapter.getStartupContext({ signal: request.signal });
+                current(attempt);
+                validateContext(context);
+                startup = context;
+                identity = { ...identity, organizationId: context.organization!.id };
+                return summary()!;
+            }
+            catch (error) {
+                if (attempt === revision)
+                    clear();
+                throw error;
+            }
+            finally {
+                if (attempt === revision)
+                    busy = false;
+            }
+        },
+        selectStore(storeId: string | null) {
+            active();
+            if (!startup)
+                throw new Error('Sign in before selecting a store.');
+            const selected: ReadIdentity = storeId === null ? { userId: session!.userId, organizationId: startup.organization!.id, revision: revision + 1 } : resolveHardwareScope(startup, storeId, revision + 1);
+            ++revision;
+            request?.abort();
+            request = null;
+            busy = false;
+            identity = selected;
+            return summary()!;
+        },
+        async read(view: LiveView, window: ReadWindow = {}): Promise<ReadResult> {
+            active();
+            if (busy)
+                throw new Error('Wait for the current read to finish.');
+            if (!startup?.organization || !identity?.storeId)
+                throw new Error('Select an authorized Hardware store first.');
+            if (!['products', 'inventory', 'invoices'].includes(view))
+                throw new Error('Choose a supported read-only view.');
+            const q = readWindow(window), attempt = revision, storeId = identity.storeId, organizationId = identity.organizationId;
+            request = new AbortController();
+            busy = true;
+            try {
+                // Revalidate active membership, company, store and role before EVERY manual data read.
+                const fresh = await adapter.getStartupContext({ signal: request.signal });
+                current(attempt);
+                validateContext(fresh);
+                if (fresh.organization?.id !== organizationId)
+                    throw new HardwareReadError('scope-mismatch', 'The authorized company changed. Sign in again.');
+                resolveHardwareScope(fresh, storeId, revision);
+                startup = fresh;
+                if (view === 'invoices' && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
+                    throw new HardwareReadError('forbidden', 'Invoice access is no longer available.');
+                let result: ReadResult;
+                if (view === 'products')
+                    result = { kind: 'products', data: await adapter.getHardwareProducts(storeId, { page: q.page, limit: 10, search: q.search }, { signal: request.signal }) };
+                else if (view === 'invoices')
+                    result = { kind: 'invoices', data: await adapter.getHardwareInvoices(storeId, { ...q, signal: request.signal }) };
+                else {
+                    const data = await adapter.getHardwareInventoryBalances(storeId, { ...q, signal: request.signal });
+                    if (data.currency !== null && data.currency !== fresh.stores.find(s => s.id === storeId)?.currency)
+                        throw new HardwareReadError('scope-mismatch', 'Inventory currency changed.');
+                    result = { kind: 'inventory', data };
+                }
+                current(attempt);
+                return result;
+            }
+            catch (error) {
+                if (attempt === revision)
+                    clear();
+                throw error;
+            }
+            finally {
+                if (attempt === revision)
+                    busy = false;
+            }
+        },
+    };
+}

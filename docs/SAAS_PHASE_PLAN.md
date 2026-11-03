@@ -89,9 +89,9 @@ No candidate deployment URL is treated as approved.
 
 ## Current read-integration checkpoint
 
-See [read-phase progress](READ_PHASE_PROGRESS.md): the deployed missing-session guard
-works; owner startup currently fails with 502. Stock and owner/admin invoice reads plus
-safer diagnostics are prepared locally. None of this establishes full production phase
+See [read-phase progress](READ_PHASE_PROGRESS.md): the owner confirms sign-in/startup/products. A
+reusable read-only workspace with scoped paging/search and fresh access checks is
+prepared locally; stock/invoice live verification remains open. None of this establishes full production phase
 completion or authorizes business writes.
 
 ## Boundaries and external prerequisites

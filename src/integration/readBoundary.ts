@@ -1,4 +1,5 @@
 import { uuid } from './decoders.ts';
+import { readWindow } from './readWindow.ts';
 /** Exact API allow-list shared by browser and server; no generic /api forwarding. */
 export function allowedReadPath(path: string): boolean {
     if (!path.startsWith('/api/') || path.includes('#'))
@@ -11,8 +12,18 @@ export function allowedReadPath(path: string): boolean {
     if (!['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices'].includes(url.pathname))
         return false;
     const keys = [...url.searchParams.keys()];
-    return keys.length === 3 && new Set(keys).size === 3 && keys.every(k => ['storeId', 'page', 'limit'].includes(k)) &&
-        uuid(url.searchParams.get('storeId')) && url.searchParams.get('page') === '1' && url.searchParams.get('limit') === '10';
+    if (keys.length < 3 || keys.length > 4 || new Set(keys).size !== keys.length || !keys.every(k => ['storeId', 'page', 'limit', 'search'].includes(k)) || !uuid(url.searchParams.get('storeId')) || url.searchParams.get('limit') !== '10')
+        return false;
+    const pageText = url.searchParams.get('page') ?? '';
+    if (!/^[1-9]\d{0,4}$/.test(pageText))
+        return false;
+    try {
+        const q = readWindow({ page: Number(pageText), search: url.searchParams.get('search') ?? '' });
+        return !url.searchParams.has('search') || q.search.length > 0;
+    }
+    catch {
+        return false;
+    }
 }
 export async function limitedText(response: Response, maxBytes = 2000000): Promise<string> {
     if (!response.body)

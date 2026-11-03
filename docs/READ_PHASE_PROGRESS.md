@@ -1,107 +1,71 @@
 # Read-only integration progress
 
-Updated 3 November 2026. All implementation changes are in the standalone Hardware
-frontend. Original OmniPOS source remains read-only. No database/schema changes or
-business writes are authorized or implemented by this milestone.
+Updated 3 November 2026. All changes are inside the new Hardware frontend. No database,
+schema, account or original OmniPOS changes have been made.
 
-## Current live evidence
+## Current evidence
 
-- Owner deployed the earlier ESM repair (`3239eff`). An agent-opened unauthenticated
-  startup URL now displays JSON `SESSION_REQUIRED`, rather than the Vercel import
-  failure. The request-log UI records that GET as HTTP 401. No bearer token was sent
-  and the guard returns before any upstream request.
-- The owner's connection tab subsequently displays “Hardware refused or could not
-  complete this read.” It has no product result. Vercel request logs show startup
-  HTTP 502 at 13:26:26 Dublin time, execution 15.25 seconds, cache BYPASS.
-- That duration closely matches the old 15-second proxy timeout. This is evidence
-  consistent with an upstream read timeout, not proof of its cause or of wrong keys.
-  No request body, password, token, environment file, or raw business records were read.
-- The local mitigation allows a single 60-second upstream GET and a 70-second browser
-  read, still with no automatic retry. Provider sign-in retains its separate 15-second
-  limit. Timeout/refusal/invalid-response diagnostics now appear with safe status/code.
-  This mitigation is NOT yet deployed or proven to resolve the owner's failure.
-- The main editable workspace remains sample-only by design. Seeing its demo products
-  does not establish successful live connectivity. Real reads stay in `/connection.html`.
+- The deployed import repair made missing-token startup return 401/`SESSION_REQUIRED`.
+- The owner subsequently reached the real company/Hardware-store selector. The agent
+  observed that selector without changing it or submitting a request.
+- **The owner now confirms seeing the existing store's products.** This establishes
+  successful sign-in/startup/product reading for that account/store as an owner report.
+  It is not evidence for all stores, roles, write operations or database isolation.
+- Earlier import errors, 15-second startup 502 and a generic authentication error are
+  historical failures. Their ultimate causes are not all proven; do not describe the
+  account as currently unable to sign in, or claim a particular mitigation caused success.
+- The new memory-only, manually paged/searchable workspace is prepared locally at
+  `/workspace.html`; it has not been deployed/live-verified. See
+  [implementation and owner check](LIVE_READ_ONLY_WORKSPACE.md).
 
-## Implemented this milestone
+## Current read surfaces
 
-The separate connection screen offers Products, Stock balances, and (for owner/admin)
-Invoice register. Each check permits one deliberate selected business read after the
-existing sign-in/startup sequence, with `page=1&limit=10`. Session/results are memory-only;
-there is no live-record import into sample drafts or local business storage.
+| Surface | Implemented | Live evidence |
+| --- | --- | --- |
+| `/connection.html` | Existing sign-in/startup and one selected product/stock/invoice read | Owner confirms products; stock/invoice results not yet reported |
+| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/invoice views, paging/search, active context recheck before each read | New code remains local; 85 tests pass with fake transport |
+| Main invoice application | Screenshot-inspired menus/forms/grid and local sample business workflows | Remains sample-only; no live records are injected into editable demo data |
 
-| View | Verified source contract | Local preparation | Live status |
-| --- | --- | --- | --- |
-| Products | Existing `/api/hardware/products` | Existing strict projection and proxy | Owner's startup gate still fails before products |
-| Stock balances | `routes/hardware/inventory.ts:165-293`; `/api/hardware/inventory/balances` | Exact decimal strings, null/zero distinction, valuation/status checks, first-page decoder, proxy and display | Not deployed or read live |
-| Invoice register | `routes/hardware/sales.ts:583-863`; `/api/hardware/sales/invoices` | Owner/admin UI/service gate plus existing backend gate, recorded totals only, first-page decoder, proxy and display | Not deployed or read live |
+All four API functions remain GET-only, with authenticated startup and the three
+verified data paths. Fixed `limit=10`; pages 1–10000 and conservative literal search
+are now allowed for the manual workspace. The one-read probe itself still requests
+only one first page. No writes, retries, polling, seed, bootstrap, contact queries,
+exports or generic forwarding have been enabled.
 
-The stock and invoice responses omit row store/organization IDs after scoped queries.
-The new frontend binds requests to the validated startup scope and trusts those
-backend checks; it does not invent response IDs as proof of isolation. Stock rejects
-contradictory scope IDs if supplied, mismatched currency, duplicate rows, malformed
-exact text, invalid availability/status combinations and inconsistent pagination.
-Invoice projection omits customer/contact/payment details and computes no profit,
-net revenue or ledger balance. Numeric amounts are shown as returned without claiming
-recoverable extra precision. Fallback/demo responses are not accepted as live evidence.
-
-All four Vercel entry points have the unbundled plain-Node regression test. They refuse
-missing-token GET and all write methods with no-store headers and zero upstream calls.
-Only startup and the three exact first-page paths are allow-listed. Other reads,
-filters, subsequent pages, exports, writes, bootstrap and seed remain unavailable.
-
-## Source evidence and limits for the following milestones
+## Following read contracts still need review
 
 Original source HEAD rechecked: `b1e70d8dc52cb980a9c6cbf056ac24d0bb794930`.
-Read `HARDWARE_CURRENT.md` first, then only relevant route/service helpers.
 
-- Customer list (`routes/hardware/customers.ts:16-193`) is a company-wide directory,
-  capped at 500, with store-specific enrichment. The required `storeId` is not used
-  to limit the base customer list or verified by `verifyHardwareStore` in this route.
-  It has no page/limit response contract. Do not portray it as a complete paginated
-  store directory or add guessed pagination parameters. Directory scope/permission
-  policy and a bounded/minimal projection need review before enabling it here.
+- Customer list (`routes/hardware/customers.ts:16-193`) is company-wide, capped at 500,
+  with store-specific enrichment. Its required `storeId` does not limit the base
+  customer list and is not verified by `verifyHardwareStore` in that handler. There
+  is no page/limit response contract. Directory scope/permission policy and a minimal
+  bounded response need review before enabling it here.
 - Supplier list (`routes/hardware/suppliers.ts:587-663`) enforces owner/admin and
-  organization/store checks but returns an unpaginated enriched list containing
-  contacts/documents/contracts. It has no verified paged/minimal list contract. It is
-  not added to this proxy. Any needed backend change is separate owner-approved work
-  in the old project; this agent has not made one.
-- Sales History root includes broad refunds/enriched data and optional demo fallback.
-  This milestone uses the narrower bounded invoice-register route instead. The
-  register excludes voided invoices and is not a complete sales/refunds report.
-- Stock balance output is paginated, but the existing handler fetches all matching
-  balances before paging. Ten returned rows do not prove bounded backend work.
-- Role, tenant isolation, authoritative reports and the backend's existing inactive-
-  profile/granular-membership gaps still require signed-in verification and owner
-  policy decisions. Frontend gates do not fix backend authorization.
+  organization/store checks but returns an unpaginated enriched list with contacts,
+  documents and contracts. No verified paged/minimal list contract has been added.
+- Stock/product responses are paginated after broader backend batching/enrichment;
+  UI paging alone does not fix server scalability.
+- The stock and invoice projections omit returned organization/store IDs. Their reads
+  bind to validated startup scope and existing backend checks; no response scope IDs
+  are invented as evidence. Product rows do carry store IDs and are checked.
+
+No change to those original handlers was made or requested as part of this milestone.
 
 ## Roadmap checkpoint
 
-| Phase | Current state | Completion gate |
+| Phase | Current state | Remaining production gate |
 | --- | --- | --- |
-| 1–2 | Sample tenancy foundation and source audit/adapters implemented | Live tenant enforcement remains unverified |
-| 3 | Isolated existing-account sign-in/startup implemented; owner startup attempt fails | Deploy diagnostic/timeout mitigation; successful owner sign-in/startup; full session/recovery/invitation work later |
-| 4 | Local catalogue/stock workflows; live-capable product and stock read screens prepared | Deploy and verify real reads; contact scope/bounds; CRUD/receiving authority needs write authorization |
-| 5 | Local sales/till/quotation/order flows; owner/admin invoice read prepared | Successful live reads; real checkout/refunds/tenders remain prohibited |
-| 6–7 | Local purchasing/receiving and allocation/reversal simulations | Exact contracts, authorized backend writes and financial authority; no live posting permitted |
-| 8 | Local reports/exports plus selected stock/invoice read views | Authoritative complete reporting, paging, devices and performance evidence |
-| 9 | Local tenant requirements draft/readiness only | Verified control-plane ownership, provisioning/billing contracts and explicit authority |
-| 10 | Build, tests, local layout and unauthenticated deployed guard verified | Successful signed-in checks, deployment/security/recovery/pilot evidence |
+| 1–2 | Sample tenancy foundation, source audit and strict read adapters | Server-enforced tenant isolation verification |
+| 3 | Owner-confirmed sign-in/startup; reusable read-only session prepared locally | Deploy/test new session UI; complete auth/recovery/invitations and revocation coverage |
+| 4 | Owner-confirmed product read; stock browsing/search/pages prepared | Verify stock live; contact contracts; CRUD/receiving need write authority |
+| 5 | Owner/admin invoice browsing/search/pages prepared; local sales/till/quotation flows | Verify invoice reads; real checkout/tenders/refunds remain prohibited |
+| 6–7 | Local purchasing, receiving and allocation/reversal simulations | Verified posting/financial authority and later explicit write authorization |
+| 8 | Local reports/exports plus bounded read-only stock/invoice views | Complete authoritative reporting, performance and devices |
+| 9 | Requirements draft/readiness only | Control-plane ownership, provisioning/billing contracts and authority |
+| 10 | 85 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
 
-**All production phases cannot be marked complete under the current no-write scope.**
-Live data changes, provisioning, billing and release authority are not inferred from
-“keep going”. Independent read preparation continues, but the owner's startup failure
-must be resolved before presenting the app as connected or expanding live operations.
-
-## Verification
-
-TypeScript, production multipage build (with environment files disabled), and all
-71 tests pass. New tests cover stock exact/unknown values, source request mapping,
-wrong/stale scope, role/currency/expiry guards, invoice projection, refused writes,
-UI escaping, timeout classification and safe diagnostics. The unbundled runtime test
-covers every API entry. A stock-layout preview was inspected using synthetic data;
-no live stock or invoice dataset was fetched by the agent.
-
-Next deployment check: missing-token startup must remain 401/JSON; the owner then
-performs a fresh sign-in and selected read, reporting only success or safe diagnostics.
-Do not share passwords, keys, tokens or records. No server/database secret is required.
+The full production roadmap is not complete. The next phase can proceed with read-only
+browsing without claiming live write functions work. Account/store/product data have
+not been copied into this repository. Supabase and database operations remain the
+owner's responsibility.

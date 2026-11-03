@@ -38,7 +38,7 @@ const nullableText = (v: unknown): string | null => v === null ? null : text(v);
 const nullableId = (v: unknown): string | null => v == null ? null : uuid(v) ? v : invalid();
 const integer = (v: unknown, min: number): number => typeof v === 'number' && Number.isSafeInteger(v) && v >= min ? v : invalid();
 /** Exact response projection from routes/hardware/inventory.ts:165-293. No arithmetic or float fallback. */
-export function decodeInventoryPage(value: unknown, scope: HardwareReadScope): InventoryPage {
+export function decodeInventoryPage(value: unknown, scope: HardwareReadScope, expectedPage = 1): InventoryPage {
     const body = record(value), pagination = record(body.pagination), valuation = record(body.valuation);
     if (body.success !== true || body.error || !Array.isArray(body.data))
         return invalid();
@@ -77,7 +77,7 @@ export function decodeInventoryPage(value: unknown, scope: HardwareReadScope): I
             stockStatus: row.stock_status as InventoryBalance['stockStatus'], stockReason: row.stock_status_reason as InventoryBalance['stockReason'] };
     });
     const total = integer(pagination.total, 0), page = integer(pagination.page, 1), limit = integer(pagination.limit, 1), totalPages = integer(pagination.totalPages, 1);
-    if (page !== 1 || limit !== 10 || totalPages !== Math.max(1, Math.ceil(total / limit)) || rows.length !== Math.min(total, limit))
+    if (page !== expectedPage || limit !== 10 || totalPages !== Math.max(1, Math.ceil(total / limit)) || rows.length !== Math.max(0, Math.min(total - (page - 1) * limit, limit)))
         return invalid();
     return { rows, total, page, limit, totalPages, currency, fractionDigits };
 }

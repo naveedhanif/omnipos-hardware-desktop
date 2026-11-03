@@ -25,7 +25,7 @@ test('connection configuration rejects secret keys, foreign targets and wrong fr
 test('exact read boundary refuses writes/extra query paths and limits response bytes', async () => {
     assert.ok(allowedReadPath(path));
     assert.ok(allowedReadPath('/api/startup-context'));
-    for (const p of ['/api/hardware/seed-defaults', '//foreign.invalid/api/startup-context', '/api/startup-context?x=1', path + '&storeId=' + store, path.replace('limit=10', 'limit=100'), path + '&search=all'])
+    for (const p of ['/api/hardware/seed-defaults', '//foreign.invalid/api/startup-context', '/api/startup-context?x=1', path + '&storeId=' + store, path.replace('limit=10', 'limit=100'), path + '&unsupported=all'])
         assert.equal(allowedReadPath(p), false);
     await assert.rejects(limitedText(new Response('123456'), 5));
 });

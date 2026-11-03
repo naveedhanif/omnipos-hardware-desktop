@@ -4,18 +4,18 @@ Updated 3 November 2026. The app remains **a local sample application**. All cha
 inside this new repository. The owner has deployed the sample frontend. The new isolated auth/read check is prepared locally but has not been deployed or live-verified by the agent.
 "Working locally" below is not completion of the corresponding production phase.
 
-Current gate (3 November): the deployed proxy import repair now returns 401 JSON for
-missing credentials. The owner's signed-in startup attempt returns HTTP 502 after
-15.25 seconds. A local timeout/diagnostic mitigation and additional read-only stock
-and invoice views pass all 71 tests, but are not deployed/live-verified. See
-[current read-phase progress](READ_PHASE_PROGRESS.md). The main workspace remains sample-only.
+Current checkpoint (3 November): the owner confirms successful real sign-in, store
+selection and product reading. A separate reusable read-only workspace is now prepared
+locally, with manual search/pages, 15-minute memory session and workspace rechecks.
+All 85 tests pass; the new workspace still needs deployment and owner verification.
+See [current read phase](READ_PHASE_PROGRESS.md). The editable invoice app remains sample-only.
 
 ## Milestone status
 
 | Phase | Implemented and locally verified | Still open |
 | --- | --- | --- |
 | 1 | Company/store context, scoped services and drafts, switch cleanup, two companies/three stores. | Production tenant enforcement. |
-| 2 | Source contract audit, 210 literal route declarations, read adapters, fake-transport tests and an opt-in, isolated auth/product check with GET-only Vercel proxy functions (not yet deployed/live-verified). | Confirmed target and live compatibility/security verification. |
+| 2 | Source contract audit, 210 literal route declarations, read adapters, fake-transport tests and an opt-in, isolated auth/product check with GET-only Vercel proxy functions. Owner confirms the initial product read; the new reusable workspace remains local. | Confirmed target and live compatibility/security verification. |
 | 3 | Provider-neutral session lifecycle with onboarding/inactive/missing-store/expiry states; demo sign-out/re-entry; local team roles, owner protection and company settings; separate consent-gated password check with memory-only session. | The complete application auth-state/provider integration, invitation delivery/acceptance, recovery and revocation tests. |
 | 4 | Local product create/edit/archive, customer/supplier edit/archive/reactivation, editable category/unit lists, stock balances/movements and validated demo adjustments. Products feed the invoice search and scoped drafts. | Stock read view prepared locally; live CRUD, atomic count/transfer/receiving authority remain open. |
 | 5 | Local invoice snapshots, sample stock changes, duplicate-reference and oversell prevention, demo till open/close, cash/card/account simulations, full demo reversal, and quotation → accepted order → invoice flow. | Owner/admin invoice register prepared locally; partial returns, real tenders/till authority, atomic checkout/refund, loyalty and unknown live outcomes. |

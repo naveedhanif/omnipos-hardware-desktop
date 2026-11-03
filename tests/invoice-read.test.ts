@@ -29,7 +29,7 @@ test('invoice adapter requests only the exact scoped GET and refuses a different
     assert.deepEqual(seen, [path]);
     assert.ok(allowedReadPath(path));
     assert.equal(allowedReadPath(path.replace('/invoices', '/refund')), false);
-    assert.equal(allowedReadPath(path + '&search=all'), false);
+    assert.equal(allowedReadPath(path + '&search=all'), true);
 });
 test('invoice read requires owner/admin, consumes one check and cannot fall back to products', async () => {
     for (const role of ['MANAGER', 'CASHIER', 'OWNER', 'admin']) {

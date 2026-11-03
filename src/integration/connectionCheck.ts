@@ -1,5 +1,5 @@
 import { createHardwareReadAdapter, type ReadRequest, type ReadResponse } from './hardwareReadAdapter.ts';
-import { resolveHardwareScope } from './decoders.ts';
+import { resolveHardwareScope, uuid } from './decoders.ts';
 import type { ReadIdentity, ReadProductPage, StartupContext } from './contracts.ts';
 import type { InventoryPage } from './inventoryRead.ts';
 import type { InvoicePage } from './invoiceRead.ts';
@@ -12,6 +12,7 @@ export interface CheckPorts {
     signIn(email: string, password: string, signal: AbortSignal): Promise<CheckSession>;
     transport(request: ReadRequest): Promise<ReadResponse>;
     now?(): number;
+    onAuthenticated?(): void;
 }
 /** One explicit sign-in + startup, then one selected read per sign-in. No storage or retries. */
 export function createConnectionCheck(ports: CheckPorts) {
@@ -48,10 +49,11 @@ export function createConnectionCheck(ports: CheckPorts) {
                 const result = await ports.signIn(email.trim(), password, controller.signal);
                 if (attempt !== revision)
                     throw new Error('Connection check ended.');
-                if (!result.accessToken || result.expiresAt <= now())
+                if (!uuid(result.userId) || typeof result.accessToken !== 'string' || !result.accessToken || /\s/.test(result.accessToken) || !Number.isFinite(result.expiresAt) || result.expiresAt <= now())
                     throw new Error('A valid session was not returned.');
                 session = result;
                 identity = { userId: result.userId, revision };
+                ports.onAuthenticated?.();
                 const context = await adapter.getStartupContext({ signal: controller.signal });
                 if (context.profile?.is_active !== true || !context.organization || !context.stores.some(s => s.business_type === 'hardware'))
                     throw new Error('An active account with an existing Hardware store is required.');

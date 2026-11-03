@@ -247,3 +247,50 @@ covered by fake responses. The stock view was inspected with synthetic layout da
 The new code has not been deployed, and no stock/invoice request was made live by the
 agent. See `READ_PHASE_PROGRESS.md` for exact remaining gates and customer/supplier
 contract limitations discovered through read-only original-source inspection.
+
+## Authentication-stage diagnostics after owner sign-in failure
+
+3 November 2026. Vercel Production confirms `0909dc0` Ready. The owner's already loaded
+connection page still has product-only consent wording and a generic authentication
+failure, before the new app has a usable provider session. This is distinct from the
+previous startup API timeout. A fresh owner-driven attempt was requested; the agent
+entered no credentials, read no token or environment values, and made no auth/API calls.
+
+The frontend now preserves only known provider error codes and safe HTTP status in an
+`AuthCheckError`; unknown messages/codes are suppressed. It shows authentication success
+separately from loading the backend workspace. Provider sign-in still sends at most
+one password-grant request with in-memory session only. No auth/database settings,
+password, account, existing application or transaction behavior was changed.
+
+All **75 tests**, TypeScript and the environment-free production build pass. New actual-
+SDK fake-response checks cover code/status projection, no workspace call on auth refusal,
+no leakage of fake private messages, SDK-computed expiry, accepted auth followed by a
+backend refusal and rejection of malformed sessions before success/read. Real sign-in
+remains unverified. See `SIGN_IN_DIAGNOSIS.md` for the exact owner handoff and limitations.
+
+## Owner product confirmation and reusable read-only workspace
+
+3 November 2026. The owner confirms seeing products from the selected existing store.
+The agent previously observed the real authorized company/store selector. This is
+owner-reported sign-in/startup/product success, not independent record extraction or
+proof of all stores, roles, writes or database isolation. Earlier failures remain
+historical; no causal fix is claimed without evidence.
+
+Prepared `/workspace.html` with a 15-minute/provider-expiry memory session, explicit
+store and view selection, manual search/pages of 10, and startup revalidation before
+each selected data read. No persistence, refresh, prefetch, polling, retries, sample
+fallback, exports or write operations. Switching stores/views, logout, expiry and
+page navigation clear results. The one-read diagnostic remains available separately.
+
+All **85 tests** pass, including ten new workspace cases for inert/consent state,
+scoped multi-view queries, revocation/company/type/role changes, stale responses,
+expiry, concurrency, invalid queries, later-page metadata, logout during auth and
+failed-read cleanup. The unbundled runtime test covers the shared query-boundary
+imports. TypeScript and the environment-free three-entry production build pass.
+Local workspace UI was inspected without sign-in: local config is absent, the form is
+disabled, and no automatic auth/API read occurs. Static style sweep clean.
+
+No actual environment file, key value or live business records were read by the agent.
+No database or existing OmniPOS code was changed. The new workspace itself remains
+local and has not been deployed or tested against a signed-in owner session. See
+`LIVE_READ_ONLY_WORKSPACE.md` for source contracts, hosting steps and remaining limits.

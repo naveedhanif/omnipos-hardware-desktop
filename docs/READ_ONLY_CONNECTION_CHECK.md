@@ -1,5 +1,7 @@
 # Existing OmniPOS read-only connection check
 
+Latest follow-up: the owner confirms successful product reading. The one-read probe is retained; a separate reusable read-only workspace is prepared at `/workspace.html`. See `LIVE_READ_ONLY_WORKSPACE.md` for current paging/search policy. Earlier failure and single-first-page sections below are the historical implementation record.
+
 Current follow-up: [read-phase progress](READ_PHASE_PROGRESS.md) records the repaired deployed guard, the owner’s subsequent 502 startup failure, the local timeout mitigation and the new stock/invoice read scope. Earlier sections below are the initial implementation/repair record.
 
 ## Deployment import repair record — 3 November 2026

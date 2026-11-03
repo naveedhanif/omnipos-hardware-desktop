@@ -27,9 +27,11 @@ function amount(v: unknown): string | null {
     return invalid();
 }
 /** Read-only subset from routes/hardware/sales.ts:583-863. Scope IDs are not in this response. */
-export function decodeInvoicePage(value: unknown): InvoicePage {
+export function decodeInvoicePage(value: unknown, expectedPage = 1): InvoicePage {
+    if (!Number.isSafeInteger(expectedPage) || expectedPage < 1)
+        return invalid();
     const body = record(value);
-    if (body.error || body.demoFallback || body.success === false || !Array.isArray(body.data) || !Number.isSafeInteger(body.count) || (body.count as number) < 0 || body.page !== 1 || body.limit !== 10)
+    if (body.error || body.demoFallback || body.success === false || !Array.isArray(body.data) || !Number.isSafeInteger(body.count) || (body.count as number) < 0 || body.page !== expectedPage || body.limit !== 10)
         return invalid();
     const seen = new Set<string>();
     const rows = body.data.map((item): ReadInvoice => {
@@ -45,7 +47,7 @@ export function decodeInvoicePage(value: unknown): InvoicePage {
         return { id: row.id, reference: text(row.receipt_number), date, status: text(row.status), tender: text(row.tender_type), subtotal: amount(row.subtotal), tax: amount(row.tax_total), total: amount(row.grand_total) };
     });
     const total = body.count as number;
-    if (rows.length !== Math.min(total, 10))
+    if (rows.length !== Math.max(0, Math.min(total - (expectedPage - 1) * 10, 10)))
         return invalid();
-    return { rows, total, page: 1, limit: 10, totalPages: Math.max(1, Math.ceil(total / 10)) };
+    return { rows, total, page: expectedPage, limit: 10, totalPages: Math.max(1, Math.ceil(total / 10)) };
 }
