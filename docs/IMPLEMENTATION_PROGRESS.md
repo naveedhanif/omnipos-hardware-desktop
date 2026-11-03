@@ -4,6 +4,12 @@ Updated 3 November 2026. The app remains **a local sample application**. All cha
 inside this new repository. The owner has deployed the sample frontend. The new isolated auth/read check is prepared locally but has not been deployed or live-verified by the agent.
 "Working locally" below is not completion of the corresponding production phase.
 
+Current gate (3 November): the owner deployed the isolated check, but its startup
+function fails module loading on Vercel. A local import/emission repair reproduces and
+fixes the failure with an unbundled Node test; all 59 tests pass. Deploy/recheck is still
+required before real sign-in/products can be called verified. See
+[current connection status](READ_ONLY_CONNECTION_CHECK.md#current-deployment-gate--3-november-2026).
+
 ## Milestone status
 
 | Phase | Implemented and locally verified | Still open |

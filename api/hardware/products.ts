@@ -1,1 +1,1 @@
-export { readOnlyHandler as default } from '../../server/readOnlyProxy';
+export { readOnlyHandler as default } from '../../server/readOnlyProxy.ts';

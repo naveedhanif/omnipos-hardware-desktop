@@ -1,5 +1,42 @@
 # Existing OmniPOS read-only connection check
 
+## Current deployment gate — 3 November 2026
+
+The owner deployed commit `52ef465`. The production connection page loads and passes
+its configuration gate. An unauthenticated GET to its `/api/startup-context` function
+returned Vercel `500 FUNCTION_INVOCATION_FAILED`; runtime logs for deployment
+`HQ86ELcjS2m6U18vijdMb8PusdCn` show `ERR_MODULE_NOT_FOUND` for
+`/var/task/server/readOnlyProxy` imported by `/var/task/api/startup-context.js`.
+The owner independently reported the same error. No token was sent by the agent and
+the function failed at module loading, before the handler could contact the backend.
+
+The local repair gives both API imports an explicit `.ts` extension and sets
+`rewriteRelativeImportExtensions: true`. TypeScript emits relative `.js` imports for
+Node, including transitive imports. No request allow-list, auth behavior, backend
+target or database setting changed. The repair has not yet been deployed or checked
+on Vercel.
+
+`tests/function-runtime.test.ts` emits the real function dependency graph as separate
+JavaScript files and starts both handlers in a child Node process with no TS loader
+or bundler. It reproduced the original missing-module error before the fix and passes
+after it. It checks missing-session GET → 401, all four write methods → 405, no-store
+headers and zero fetch calls. The earlier bundle-only check did not catch this error.
+All 59 tests, TypeScript and the environment-free frontend build pass locally.
+
+After deploying the repair, first check `/api/startup-context` WITHOUT credentials:
+it must return JSON with `SESSION_REQUIRED` (401), not a Vercel 500/HTML page. This
+request must not reach the existing backend. Then the owner can retry existing-account
+sign-in and the product read. Agent-run authenticated calls still need the specific
+account/store approval described below. Do not mark connectivity verified until that
+signed-in sequence succeeds. Subsequent stock/customer/supplier integration remains
+behind this gate; inventory source inspection alone is not a live result.
+
+References: [Node ESM extensions](https://nodejs.org/api/esm.html#mandatory-file-extensions),
+[TypeScript extension rewriting](https://www.typescriptlang.org/tsconfig/rewriteRelativeImportExtensions.html),
+[Vercel TypeScript compiler implementation](https://github.com/vercel/vercel/blob/main/packages/node/src/typescript.ts).
+
+## Initial implementation record
+
 Prepared 3 November 2026 in the new Hardware repository only. This implementation has
 not been pushed, deployed or checked against live authentication/business data by the
 agent. The existing OmniPOS project and database are unchanged.

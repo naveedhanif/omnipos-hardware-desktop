@@ -194,3 +194,31 @@ Still open: Vercel function deployment/routing, runtime/build public configurati
 issuer match, signed-in compatibility and production authorization. Ask before agent-run
 live requests. Authentication itself creates provider session/audit activity; read-only
 means no business-record writes. See `READ_ONLY_CONNECTION_CHECK.md` for exact scope.
+
+## Deployed function import failure and local repair
+
+3 November 2026. The owner's deployed connection screen loads and shows the expected
+public target values without a configuration error. No credentials were entered by
+the agent. An unauthenticated request to the new frontend's startup function returned
+`500 FUNCTION_INVOCATION_FAILED`. Vercel runtime logs show `ERR_MODULE_NOT_FOUND` for
+the extensionless `server/readOnlyProxy` import. The owner reported the same error.
+This is module initialization failure before any handler/backend/database call.
+
+- Both API entry imports now use `.ts`; TypeScript is configured to rewrite relative
+  extensions in emitted JavaScript. This addresses both entries and their transitive
+  `.ts` imports without changing request scope, auth, database configuration or records.
+- A new regression test emits separate files using the actual project's TypeScript
+  options, then starts the emitted handlers in plain Node. Before the fix it reproduced
+  `ERR_MODULE_NOT_FOUND`; after the fix it passes. Both functions refuse missing-token
+  GET with 401 and POST/PUT/PATCH/DELETE with 405 and no-store headers, with zero network
+  calls. The earlier bundled-only verification hid runtime resolution differences.
+- All **59 tests pass**. TypeScript and the frontend build also pass; Vite was run with
+  environment-file loading disabled. No environment files or key values were read.
+- Read-only inspection of original inventory source confirmed the balance route and
+  exact-decimal/valuation contract, but no inventory proxy/adapter expansion was made
+  while fixing this prerequisite. The inventory response omits row store/organization
+  IDs after mapping; future decoders must not invent those as response evidence.
+
+The repair remains local until published. Still required: deploy it, observe startup
+401/JSON with no credentials, then verify owner-driven sign-in/products. No signed-in
+connectivity, issuer matching, database behavior or production isolation is claimed.
