@@ -119,3 +119,8 @@
 #live-workspace .table-scroll{max-width:100%}
 #live-workspace .app-header{height:auto;min-height:65px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}
 @media(max-width:720px){#live-workspace .live-company{margin-left:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}#live-workspace .live-read-tabs button{min-height:44px}}
+
+.workspace-diagnostic{border:1px solid var(--line);padding:12px 16px;margin:16px 0;border-radius:4px}
+.workspace-diagnostic summary{font-weight:600}
+.workspace-diagnostic p{font-size:12px;color:var(--muted)}
+.workspace-diagnostic pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.7;background:var(--soft);padding:12px;max-width:100%}

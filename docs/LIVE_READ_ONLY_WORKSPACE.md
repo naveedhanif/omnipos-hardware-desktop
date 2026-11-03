@@ -66,7 +66,7 @@ connection policy in `vercel.json`.
 
 ## Verification and limits
 
-- All **116 tests** pass; TypeScript covers browser/server/API code. The production build
+- All **123 tests** pass; TypeScript covers browser/server/API code. The production build
   emits `index.html`, `connection.html`, and `workspace.html`, with environment-file
   loading explicitly disabled during verification. No real key was read by the agent.
 - Ten workspace tests cover inert/consent state, real-scope selection/deselection,
@@ -123,3 +123,8 @@ After loading, focus moves to results or the safe status message; store/view sel
 restores focus to the selected control. Read-only expiry is visible in local time.
 Clear displayed records drops this page's result reference without a request, sign-out
 or change to the absolute session expiry. See [hardening details](WORKSPACE_HARDENING.md).
+
+Connection diagnostics now distinguish sign-in, workspace-check and data-read failure
+stages. Only the latest projected summary stays in memory; there is no telemetry or
+record export. Codes are allowlisted and references require UUID shape. See
+[diagnostics and recovery](WORKSPACE_DIAGNOSTICS.md).

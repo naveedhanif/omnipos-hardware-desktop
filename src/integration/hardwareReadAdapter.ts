@@ -1,3 +1,4 @@
+import { projectReadCode, projectReadReference } from './safeReadDiagnostics.ts';
 import { decodeRateDifferencePage } from './rateDifferenceRead.ts';
 import { decodeSupplierReturnPage } from './supplierReturnRead.ts';
 import { decodeSupplierInvoicePage } from './supplierInvoiceRead.ts';
@@ -38,7 +39,6 @@ function scoped(identity: ReadIdentity, storeId: string): HardwareReadScope {
         throw new HardwareReadError('scope-mismatch', 'Requested store does not match the current workspace.');
     return identity as HardwareReadScope;
 }
-const safeDiagnostic = (value: unknown): string | undefined => typeof value === 'string' && /^[\w.-]{1,160}$/.test(value) ? value : undefined;
 export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
     function capture(): ReadIdentity {
         if (ports.enabled !== true)
@@ -95,7 +95,7 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
         }
         if (response.status < 200 || response.status >= 300) {
             const data = body && typeof body === 'object' && !Array.isArray(body) ? record(body) : {};
-            throw new HardwareReadError(response.status === 401 ? 'unauthenticated' : response.status === 403 ? 'forbidden' : 'http', 'Hardware refused or could not complete this read.', response.status, safeDiagnostic(data.code), safeDiagnostic(data.correlationId));
+            throw new HardwareReadError(response.status === 401 ? 'unauthenticated' : response.status === 403 ? 'forbidden' : 'http', 'Hardware refused or could not complete this read.', response.status, projectReadCode(data.code), projectReadReference(data.correlationId));
         }
         return body;
     }

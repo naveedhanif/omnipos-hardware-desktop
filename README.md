@@ -161,3 +161,10 @@ Use Left/Right, Home and End on the workspace tabs, then Tab into the selected p
 After reads, focus moves to results or status. Session expiry is visible; Clear displayed
 records empties the screen without a request or sign-out. Reloading still ends the
 memory-only session. See [hardening and limits](docs/WORKSPACE_HARDENING.md).
+
+## Connection diagnostics
+
+The live read-only workspace shows a copyable in-memory diagnostic for the latest
+operation: failure stage, known code/status and manual recovery guidance. It excludes
+credentials, business identities, search terms and records, and sends no telemetry.
+Unknown backend codes/references are suppressed. See [scope and verification](docs/WORKSPACE_DIAGNOSTICS.md).

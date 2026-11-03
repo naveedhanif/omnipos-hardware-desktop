@@ -17,12 +17,12 @@ test('read timeout is distinct from network refusal, with one attempt and no raw
     assert.equal(JSON.parse(other.body).code, 'UPSTREAM_READ_UNCONFIRMED');
 });
 test('UI diagnostics expose safe status/code but suppress server text and unknown errors', () => {
-    const error = new HardwareReadError('http', 'private backend text', 502, 'UPSTREAM_READ_TIMEOUT', 'req-fixture');
+    const error = new HardwareReadError('http', 'private backend text', 502, 'UPSTREAM_READ_TIMEOUT', '44444444-4444-4444-8444-444444444444');
     const text = connectionError(error);
     assert.ok(text.includes('60 seconds'));
     assert.ok(text.includes('HTTP 502'));
     assert.ok(text.includes('UPSTREAM_READ_TIMEOUT'));
-    assert.ok(text.includes('req-fixture'));
+    assert.ok(text.includes('44444444-4444-4444-8444-444444444444'));
     assert.equal(text.includes('private backend text'), false);
     assert.equal(connectionError(new Error('secret-token-value')).includes('secret-token-value'), false);
     assert.ok(connectionError(new HardwareReadError('unauthenticated', 'raw', 401)).includes('HTTP 401'));

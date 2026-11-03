@@ -17,6 +17,7 @@ const providerCodes: Readonly<Record<string, AuthCheckCode>> = {
     captcha_failed: 'AUTH_CAPTCHA_REQUIRED', insufficient_aal: 'AUTH_MFA_REQUIRED',
     user_banned: 'AUTH_ACCOUNT_UNAVAILABLE', user_not_found: 'AUTH_INVALID_CREDENTIALS',
 };
+export const projectAuthProviderCode = (value: unknown): string | undefined => typeof value === 'string' && Object.hasOwn(providerCodes, value) ? value : undefined;
 /** Never copy provider messages, arbitrary codes, emails, response bodies or tokens. */
 export function projectAuthError(error: unknown, failure?: 'timeout' | 'network' | 'blocked' | null): AuthCheckError {
     if (error instanceof AuthCheckError)

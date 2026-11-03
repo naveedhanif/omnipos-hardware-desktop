@@ -122,3 +122,8 @@ focus restoration, visible absolute session expiry and a no-request clear-result
 to the read-only workspace. It adds no live capability. Local keyboard behavior was
 checked with a sample-only browser harness; signed-in deployment, cross-tenant security,
 recovery, full accessibility and pilot gates remain open. See [hardening record](WORKSPACE_HARDENING.md).
+
+Phase 10 now also includes safe in-memory failure-stage diagnostics and manual recovery
+guidance. This is local observability for an explicit attempt, not production telemetry,
+auth recovery implementation, automatic retries or release certification. See
+[diagnostic milestone](WORKSPACE_DIAGNOSTICS.md).

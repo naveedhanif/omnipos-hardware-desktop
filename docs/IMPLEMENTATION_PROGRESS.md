@@ -8,7 +8,7 @@ Current checkpoint (3 November): the owner confirms successful real sign-in, sto
 selection and product reading. A separate reusable read-only workspace is now prepared
 locally, with manual search/pages, 15-minute memory session and workspace rechecks. The next
 Phase 6 slice now includes read-only owner/admin goods receipts with recorded lines and read-only supplier invoice and supplier return registers.
-All 116 tests pass; the new workspace still needs deployment and owner verification.
+All 123 tests pass; the new workspace still needs deployment and owner verification.
 Phase 8 now also has a live-capable purchase rate-difference report, paged by invoice.
 See [current read phase](READ_PHASE_PROGRESS.md). The editable invoice app remains sample-only.
 
@@ -25,7 +25,7 @@ See [current read phase](READ_PHASE_PROGRESS.md). The editable invoice app remai
 | 7 | Local account balances and allocations; over-allocation refusal and replay protection by local reference; reasoned allocation reversal, customer statement, and retained reversal history. | Real trade ledger, payment authority, reconciliation, bills, cheque/PDC and journal contracts. |
 | 8 | Locally derived sample reports, stock value unavailable when stock is unknown, print action, selected-store CSV export, bounded all-or-nothing sample product CSV import, local JSON snapshot download and preview/confirmed same-store business restore. Four sample registers have filters, 20-row pages and filtered CSV export. A separate read-only live-capable purchase rate-difference report reuses backend invoice pagination; no live export. | Authoritative server reporting/pagination, complete reporting coverage, real import contracts, print devices and production backup/recovery. |
 | 9 | Explicit SaaS readiness/control-plane boundary and disabled billing/provisioning controls. Company-scoped requirements draft with local JSON download. No invented plan, charge or entitlement. | Tenant provisioning, subscription/provider ownership, billing/webhooks, server entitlements and audited support authority. |
-| 10 | Read-only workspace keyboard tabs/focus/labelled panels, visible session expiry and clear-results control; unit checks, browser flows at desktop/mobile sizes, corrupt-state rejection, CSV formula protection, no external-request verification, release-gate checklist, and a pinned build/test GitHub Actions workflow (not yet run remotely). | Independent security review, approved deployment, production recovery/restore, observability, production performance and signed-in pilot. |
+| 10 | Read-only workspace safe in-memory failure diagnostics/manual recovery; keyboard tabs/focus/labelled panels, visible session expiry and clear-results control; unit checks, browser flows at desktop/mobile sizes, corrupt-state rejection, CSV formula protection, no external-request verification, release-gate checklist, and a pinned build/test GitHub Actions workflow (not yet run remotely). | Independent security review, approved deployment, production recovery/restore, observability, production performance and signed-in pilot. |
 
 **The full production roadmap is not complete.** Phases 3–10 remain partial or gated.
 The user requested continued independent work; this milestone carries working local
