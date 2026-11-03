@@ -169,3 +169,28 @@ sales refunds, billing/provisioning, monitoring, production recovery or pilot re
 is claimed. Snapshot restore is only for healthy local business storage and excludes
 team/settings, quotation/order documents and saved invoice drafts. Local report paging
 bounds displayed rows, not server reads. See the current progress matrix for details.
+
+## Isolated existing-auth/product connection preparation
+
+3 November 2026. Added a separate `/connection.html` screen, official auth SDK,
+strict browser request boundaries and two GET-only Vercel functions for the existing
+startup/product contracts. No direct database SDK call, table/RPC access, business
+write, migration, seed, transaction proxy or changes in the original OmniPOS project.
+The main invoice workspace continues to use sample data.
+
+- TypeScript checks cover UI, tests, `api/` and shared server code. Multipage Vite build
+  passes with environment-file loading explicitly disabled; no real key was loaded.
+- **58 tests pass**, including ten new configuration/key rejection, proxy/no-store,
+  response bound, consent, inactive/foreign identity, expiry, stale result, one-shot
+  failure and SDK fake-fetch checks. All network dependencies in tests are fakes.
+- Local connection UI was inspected: missing local configuration is shown, credentials
+  and sign-in are disabled, and no auth/API request is triggered on opening the screen.
+  Configuration exists only in Vercel; no actual local environment file was inspected.
+- Public target values were previously inspected in the owner's Vercel UI; browser
+  key stayed masked. Installation fetched the official npm package only, not any
+  customer Supabase endpoint. No live sign-in, product GET or database call was made.
+
+Still open: Vercel function deployment/routing, runtime/build public configuration,
+issuer match, signed-in compatibility and production authorization. Ask before agent-run
+live requests. Authentication itself creates provider session/audit activity; read-only
+means no business-record writes. See `READ_ONLY_CONNECTION_CHECK.md` for exact scope.

@@ -1,0 +1,54 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import { hardwareTargets } from '../src/integration/connectionConfig.ts';
+import { allowedReadPath, limitedText } from '../src/integration/readBoundary.ts';
+export interface ProxyInput {
+    method: string;
+    path: string;
+    authorization?: string;
+    apiOrigin?: string;
+}
+export interface ProxyResult {
+    status: number;
+    body: string;
+}
+const fail = (status: number, code: string): ProxyResult => ({ status, body: JSON.stringify({ error: 'Read-only connection check could not complete.', code }) });
+/** Injectable fetch; tests never contact the approved deployment. */
+export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promise<ProxyResult> {
+    if (input.method !== 'GET')
+        return fail(405, 'READ_ONLY_METHOD');
+    if (!allowedReadPath(input.path))
+        return fail(404, 'READ_PATH_NOT_ALLOWED');
+    if (!input.authorization || !/^Bearer [A-Za-z0-9._~-]{1,8192}$/.test(input.authorization))
+        return fail(401, 'SESSION_REQUIRED');
+    if (input.apiOrigin?.replace(/\/$/, '') !== hardwareTargets.apiOrigin)
+        return fail(503, 'PROXY_TARGET_NOT_CONFIGURED');
+    try {
+        const response = await fetcher(hardwareTargets.apiOrigin + input.path, {
+            method: 'GET', headers: { Authorization: input.authorization, Accept: 'application/json' },
+            redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(15000),
+        });
+        if (!response.ok)
+            return fail([401, 403, 404, 429, 503].includes(response.status) ? response.status : 502, 'UPSTREAM_READ_REFUSED');
+        if (!response.headers.get('content-type')?.toLowerCase().includes('application/json'))
+            return fail(502, 'UPSTREAM_INVALID_RESPONSE');
+        const body = await limitedText(response);
+        JSON.parse(body);
+        return { status: 200, body };
+    }
+    catch {
+        return fail(502, 'UPSTREAM_READ_UNCONFIRMED');
+    }
+}
+export async function readOnlyHandler(req: IncomingMessage, res: ServerResponse) {
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
+    res.setHeader('Vary', 'Authorization');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    if (req.method !== 'GET')
+        res.setHeader('Allow', 'GET');
+    const result = await proxyRead({ method: req.method ?? '', path: req.url ?? '', authorization: req.headers.authorization, apiOrigin: process.env.VITE_OMNIPOS_API_ORIGIN }, fetch);
+    res.statusCode = result.status;
+    res.end(result.body);
+}

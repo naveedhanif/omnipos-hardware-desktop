@@ -1,7 +1,15 @@
 # Separate frontend connection: verified source and missing public configuration
 
+Implementation follow-up (3 November 2026): see [the isolated read-only connection check](READ_ONLY_CONNECTION_CHECK.md). The source findings below remain the audit record; statements about no SDK/transport describe the pre-implementation handoff. The new check is not live-verified and makes no automatic calls.
+
 2 November 2026. No deployment URL is approved by inference. Real sign-in, live API
 calls and all live transaction posting remain disabled.
+
+Follow-up: source was rechecked at the same local HEAD for the requested configuration
+handoff. See [exact configuration and connection gate](CONNECTION_CONFIGURATION.md)
+and the root `.env.example`. That report distinguishes the first password-only check
+from later email callbacks, identifies authorization gaps in the inspected shared
+helpers, and defines the proposed new frontend variable names. No live call is approved.
 
 ## What local files verify
 

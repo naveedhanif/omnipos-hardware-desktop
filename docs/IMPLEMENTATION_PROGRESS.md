@@ -1,7 +1,7 @@
 # Implementation progress and remaining release gates
 
-Updated 2 November 2026. The app remains **a local sample application**. All changes are
-inside this new repository. Nothing has been deployed or connected to OmniPOS/Supabase.
+Updated 3 November 2026. The app remains **a local sample application**. All changes are
+inside this new repository. The owner has deployed the sample frontend. The new isolated auth/read check is prepared locally but has not been deployed or live-verified by the agent.
 "Working locally" below is not completion of the corresponding production phase.
 
 ## Milestone status
@@ -9,8 +9,8 @@ inside this new repository. Nothing has been deployed or connected to OmniPOS/Su
 | Phase | Implemented and locally verified | Still open |
 | --- | --- | --- |
 | 1 | Company/store context, scoped services and drafts, switch cleanup, two companies/three stores. | Production tenant enforcement. |
-| 2 | Source contract audit, 210 literal route declarations, disabled read adapters, fake-transport tests. | Confirmed target and live compatibility/security verification. |
-| 3 | Provider-neutral session lifecycle with onboarding/inactive/missing-store/expiry states; demo sign-out/re-entry; local team roles, owner protection and company settings. | Real provider wiring, auth-state UI/provider integration, invitation delivery/acceptance, recovery and revocation tests. |
+| 2 | Source contract audit, 210 literal route declarations, read adapters, fake-transport tests and an opt-in, isolated auth/product check with GET-only Vercel proxy functions (not yet deployed/live-verified). | Confirmed target and live compatibility/security verification. |
+| 3 | Provider-neutral session lifecycle with onboarding/inactive/missing-store/expiry states; demo sign-out/re-entry; local team roles, owner protection and company settings; separate consent-gated password check with memory-only session. | The complete application auth-state/provider integration, invitation delivery/acceptance, recovery and revocation tests. |
 | 4 | Local product create/edit/archive, customer/supplier edit/archive/reactivation, editable category/unit lists, stock balances/movements and validated demo adjustments. Products feed the invoice search and scoped drafts. | Live CRUD, atomic count/transfer/receiving authority. |
 | 5 | Local invoice snapshots, sample stock changes, duplicate-reference and oversell prevention, demo till open/close, cash/card/account simulations, full demo reversal, and quotation → accepted order → invoice flow. | Partial returns, real tenders/till authority, atomic checkout/refund, loyalty and unknown live outcomes. |
 | 6 | Multi-line local purchase orders, partial receipts with accepted/damaged/rejected/quarantined quantities, receipt-reference replay checks, supplier invoice draft linked to a fully received order; owner/admin demo gate. | RFQ lifecycle, authoritative GRN/discrepancy handling, matching, source-traceable liabilities and voucher/return authority. Import/Excise/Proforma stay previews. |

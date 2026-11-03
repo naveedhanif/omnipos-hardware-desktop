@@ -1,7 +1,9 @@
 # OmniPOS Hardware frontend prototype
 
 Standalone visual prototype inspired by the supplied desktop invoice screenshot.
-All implementation lives in this folder. It does not connect to OmniPOS or Supabase.
+All implementation lives in this folder. The editable workspace uses sample data.
+A separate, opt-in read-only connection check is prepared for existing OmniPOS auth/API;
+no business writes or direct database client are available.
 
 ## Run
 
@@ -20,7 +22,9 @@ The app is moving toward a multi-tenant Hardware SaaS product. See the
 Phase 1 introduces a **sample** tenant-aware frontend, not production authorization.
 Phase 2 adds the [backend/session audit](docs/PHASE_2_BACKEND_CONTRACT_AUDIT.md),
 [source route inventory](docs/HARDWARE_ROUTE_INVENTORY.json), and a disabled read-adapter
-layer tested with fake responses. The app still uses sample data and has no live transport.
+layer tested with fake responses. The editable app still uses sample data. A separate
+[read-only connection screen](docs/READ_ONLY_CONNECTION_CHECK.md) now has restricted
+auth/read transport; it makes no request until explicit consent and user action.
 The existing verified startup contract returns one organization per authenticated profile;
 production multi-company membership must not be inferred from the demo switcher.
 
@@ -31,10 +35,19 @@ and remaining release gates. Product management, local contacts/stock adjustment
 demo sales/tills/full reversals, quotation/order conversion, multi-line purchasing and partial receipts, account
 allocations/reversals, customer statements, filtered paged reports and CSV/snapshot tools now share tenant-scoped browser data.
 
-Settings → Connection setup explains why live sign-in, API calls and posting remain
-disabled. The [separate frontend connection audit](docs/SEPARATE_FRONTEND_CONNECTION.md)
+Settings → Connection setup links to the isolated read-only connection check. The
+main workspace continues to use sample data, and transaction posting remains disabled. The [separate frontend connection audit](docs/SEPARATE_FRONTEND_CONNECTION.md)
 records verified source behavior and exact missing public configuration. No API endpoint
 has been approved by inference. Use sample data only; this is not production SaaS security.
+
+For the rechecked source findings, exact configuration names and private local setup,
+read [connection configuration](docs/CONNECTION_CONFIGURATION.md). The root
+`.env.example` contains placeholders only. Copy it to ignored `.env.local` yourself;
+never copy the old application's environment file or enter server secrets here.
+The [implemented check](docs/READ_ONLY_CONNECTION_CHECK.md) uses these public values
+after deployment. It supports explicit existing-account sign-in, startup context and
+one product page through two Vercel GET-only functions. No request runs merely on
+page load. Live verification has not been performed; transaction posting stays disabled.
 
 ## Try it
 
@@ -67,7 +80,9 @@ has been approved by inference. Use sample data only; this is not production Saa
 - Remove an item; Ctrl/Command Z outside text fields undoes the last add/remove.
 - Print produces a sample draft preview, explicitly marked as unposted.
 
-Fixtures are behind `HardwareCatalogService` in `src/services/`. Live transport is disabled; integration adapters are tested using fake transport only. The verified product contract subset and remaining backend gates are in
+Fixtures are behind `HardwareCatalogService` in `src/services/`. The editable workspace uses sample services. The separate connection screen has a
+restricted live-capable transport tested with fake responses; real requests remain
+subject to user consent. Vite alone does not serve the Vercel API functions. The verified product contract subset and remaining backend gates are in
 [API_COMPATIBILITY.md](docs/API_COMPATIBILITY.md). Customer choices are local sample contacts.
 Sample invoices, totals, discounts and charges are illustrative, not accounting authority.
 Storage is local to one browser origin; unsaved edits warn on leaving. Do not enter
@@ -82,14 +97,14 @@ For future updates from this project folder:
 ```sh
 cd '/Users/naveedhanif/Codex projects/omnipos-hardware-desktop'
 git status --short --branch
-git add .github package.json package-lock.json src docs tests README.md
+git add .gitignore .env.example api server connection.html vite.config.ts vercel.json tsconfig.json package.json package-lock.json src docs tests README.md
 git commit -m "Update Hardware frontend prototype"
 git push origin main
 ```
 
 Review the changes before committing. These commands commit and push the new frontend
-repository; they do not open a PR, perform a merge, deploy the app or apply database
-changes. Dependencies, build output, screenshots and environment files are ignored.
+repository; they do not open a PR, perform a merge or apply database
+changes. The linked Vercel project can automatically build and deploy a pushed main commit. Dependencies, build output, screenshots and environment files are ignored.
 
 ## Purchase invoice voucher menu
 
