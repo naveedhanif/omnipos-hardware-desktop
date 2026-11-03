@@ -23,12 +23,13 @@ schema, account or original OmniPOS changes have been made.
 | Surface | Implemented | Live evidence |
 | --- | --- | --- |
 | `/connection.html` | Existing sign-in/startup and one selected product/stock/invoice read | Owner confirms products; stock/invoice results not yet reported |
-| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/sales-invoice/receipt/supplier-invoice views, paging/search, active context recheck before each read | New code remains local; 97 tests pass with fake transport |
+| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/sales-invoice/receipt/supplier-invoice/supplier-return views plus purchase rate differences, paging/search, active context recheck before each read | New code remains local; 111 tests pass with fake transport |
 | Main invoice application | Screenshot-inspired menus/forms/grid and local sample business workflows | Remains sample-only; no live records are injected into editable demo data |
 
-All six API functions remain GET-only, with authenticated startup and the five
-verified data paths. Fixed `limit=10`; pages 1–10000 and conservative literal search
-are now allowed for the manual workspace. The one-read probe itself still requests
+All eight API functions remain GET-only, with authenticated startup and the seven
+verified data paths. Fixed `limit=10`; pages 1–10000. Conservative literal search is allowed for list
+views. Rate differences support invoice pages only, without search. Their invoice
+counts must never be labelled as flattened line counts. The one-read probe itself still requests
 only one first page. No writes, retries, polling, seed, bootstrap, contact queries,
 exports or generic forwarding have been enabled.
 
@@ -53,7 +54,8 @@ Original source HEAD rechecked: `b1e70d8dc52cb980a9c6cbf056ac24d0bb794930`.
   UI paging alone does not fix server scalability.
 - The stock and invoice projections omit returned organization/store IDs. Their reads
   bind to validated startup scope and existing backend checks; no response scope IDs
-  are invented as evidence. Product rows do carry store IDs and are checked.
+  are invented as evidence. Product rows do carry store IDs and are checked. The supplier-return register
+  also omits scope IDs; its authorization is bound to the request/startup/backend.
 
 No change to those original handlers was made or requested as part of this milestone.
 
@@ -65,10 +67,10 @@ No change to those original handlers was made or requested as part of this miles
 | 3 | Owner-confirmed sign-in/startup; reusable read-only session prepared locally | Deploy/test new session UI; complete auth/recovery/invitations and revocation coverage |
 | 4 | Owner-confirmed product read; stock browsing/search/pages prepared | Verify stock live; contact contracts; CRUD/receiving need write authority |
 | 5 | Owner/admin invoice browsing/search/pages prepared; local sales/till/quotation flows | Verify invoice reads; real checkout/tenders/refunds remain prohibited |
-| 6–7 | Local simulations plus owner/admin read-only goods receipts and supplier invoice register | Verified posting/financial authority and later explicit write authorization |
-| 8 | Local reports/exports plus bounded read-only stock/invoice views | Complete authoritative reporting, performance and devices |
+| 6–7 | Local simulations plus owner/admin read-only goods receipts, supplier invoices and supplier returns | Verified posting/financial authority and later explicit write authorization |
+| 8 | Local reports/exports plus read-only stock/invoice views and purchase rate differences | Complete authoritative reporting, performance and devices |
 | 9 | Requirements draft/readiness only | Control-plane ownership, provisioning/billing contracts and authority |
-| 10 | 97 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
+| 10 | 111 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
 
 The full production roadmap is not complete. The next phase can proceed with read-only
 browsing without claiming live write functions work. Account/store/product data have
@@ -93,3 +95,23 @@ diagnostics remain distinct from empty results; no flags or setup are changed. N
 reconciled payable/payment-status contract was verified, so none is invented. See
 [contract and owner check](SUPPLIER_INVOICES_READ.md). This addition has local checks
 only; signed-in deployment verification remains outstanding.
+
+## Supplier return register milestone
+
+The next Phase 6 slice adds read-only owner/admin supplier returns with manual
+reference search/pages, recorded source references/statuses/dates and currency.
+Submitted status never implies independent approval; stock-posted status never
+implies a supplier credit or payable adjustment. Server write flags are discarded
+from the read model. No create, submit, post, detail or source-preparation endpoint
+is enabled. See [contract and owner check](SUPPLIER_RETURNS_READ.md). This milestone
+has local test/build evidence only; signed-in deployment verification remains open.
+
+## Purchase rate differences milestone (Phase 8)
+
+The first live-capable purchasing report reuses the existing owner/admin rate-difference
+GET, manually paged by ten qualifying invoices. It preserves backend quantity, unit-rate
+and monetary line differences without recalculating them. Missing/invalid evidence
+stays unavailable. A page with no lines does not prove there are no qualifying invoices.
+There is no search, export, matching validation or posting. See [contract and check](PURCHASE_RATE_DIFFERENCES_READ.md).
+Local checks pass; signed-in deployment verification remains outstanding. Phase 7
+finance remains gated by bounded, reconciled read contracts and write authority.

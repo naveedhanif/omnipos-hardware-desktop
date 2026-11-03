@@ -35,16 +35,16 @@ test('unbundled emitted API entries start in plain Node and refuse unauthenticat
             mkdirSync(dirname(destination), { recursive: true });
             writeFileSync(destination, result.outputText);
         }
-        for (const entry of ['api/startup-context.ts', 'api/hardware/products.ts', 'api/hardware/inventory/balances.ts', 'api/hardware/sales/invoices.ts', 'api/hardware/goods-receipts.ts', 'api/hardware/supplier-invoices.ts'])
+        for (const entry of ['api/startup-context.ts', 'api/hardware/products.ts', 'api/hardware/inventory/balances.ts', 'api/hardware/sales/invoices.ts', 'api/hardware/goods-receipts.ts', 'api/hardware/supplier-invoices.ts', 'api/hardware/supplier-returns.ts', 'api/hardware/supplier-invoices/reports/rate-differences.ts'])
             emit(join(root, entry));
-        const entryUrls = ['api/startup-context.js', 'api/hardware/products.js', 'api/hardware/inventory/balances.js', 'api/hardware/sales/invoices.js', 'api/hardware/goods-receipts.js', 'api/hardware/supplier-invoices.js'].map(p => pathToFileURL(join(output, p)).href);
+        const entryUrls = ['api/startup-context.js', 'api/hardware/products.js', 'api/hardware/inventory/balances.js', 'api/hardware/sales/invoices.js', 'api/hardware/goods-receipts.js', 'api/hardware/supplier-invoices.js', 'api/hardware/supplier-returns.js', 'api/hardware/supplier-invoices/reports/rate-differences.js'].map(p => pathToFileURL(join(output, p)).href);
         const script = `
             import assert from 'node:assert/strict';
             let calls=0;
             globalThis.fetch=async()=>{calls++;throw new Error('Network is forbidden in this test');};
             for(const [index,url] of ${JSON.stringify(entryUrls)}.entries()) {
                 const {default:handler}=await import(url);
-                const path=index===0?'/api/startup-context':['','/api/hardware/products','/api/hardware/inventory/balances','/api/hardware/sales/invoices','/api/hardware/goods-receipts','/api/hardware/supplier-invoices'][index]+'?storeId=33333333-3333-4333-8333-333333333333&page=1&limit=10';
+                const path=index===0?'/api/startup-context':['','/api/hardware/products','/api/hardware/inventory/balances','/api/hardware/sales/invoices','/api/hardware/goods-receipts','/api/hardware/supplier-invoices','/api/hardware/supplier-returns','/api/hardware/supplier-invoices/reports/rate-differences'][index]+'?storeId=33333333-3333-4333-8333-333333333333&page=1&limit=10';
                 for(const method of ['GET','POST','PUT','PATCH','DELETE']) {
                     const headers={};let body='';
                     const res={statusCode:0,setHeader:(k,v)=>headers[k]=v,end:v=>body=v};

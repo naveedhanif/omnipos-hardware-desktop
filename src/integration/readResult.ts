@@ -1,3 +1,5 @@
+import type { RateDifferencePage } from './rateDifferenceRead.ts';
+import type { SupplierReturnPage } from './supplierReturnRead.ts';
 import type { SupplierInvoicePage } from './supplierInvoiceRead.ts';
 import type { ReceiptPage } from './receiptRead.ts';
 import type { ReadProductPage } from './contracts.ts';
@@ -18,4 +20,10 @@ export type ReadResult = {
 } | {
     kind: 'supplierInvoices';
     data: SupplierInvoicePage;
+} | {
+    kind: 'supplierReturns';
+    data: SupplierReturnPage;
+} | {
+    kind: 'rateDifferences';
+    data: RateDifferencePage;
 };

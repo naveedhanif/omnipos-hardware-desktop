@@ -19,10 +19,11 @@ implementation. Settings → Connection setup and the diagnostic page link to it
   sign-out. Reloading/signing out/expiry/navigation clears the session and records.
 - Choose a Hardware store from the authenticated company context. Company is read-only;
   the current backend supports one organization per profile, not a new company-switch API.
-- Browse Products, Stock balances, and the owner/admin Invoice register, Goods receipts and Supplier invoices. Selecting a
+- Browse Products, Stock balances, and the owner/admin Invoice register, Goods receipts, Supplier invoices, Supplier returns and Purchase rate differences. Selecting a
   view or store clears results and does not automatically load data.
 - Search explicitly with Load records. Previous/Next also require a deliberate click.
-  Every result page has 10 records. The maximum page is 10000; search is capped at
+  List pages request 10 records. The rate-difference report pages by 10 qualifying
+  invoices, with a variable number of returned lines and no search. The maximum page is 10000; search is capped at
   120 characters with conservative literal letters/numbers/basic code punctuation.
   These are frontend/proxy limits, not invented backend pagination parameters.
 - Each manual data read first re-reads `/api/startup-context` to check active profile,
@@ -52,6 +53,8 @@ Read-only source: `/Users/naveedhanif/Codex projects/multistore-application--mai
 | Invoice register | `/api/hardware/sales/invoices` | `routes/hardware/sales.ts:583-863`: active owner/admin gate, company/store-scoped query, page/limit/search, count; excludes voided invoices. |
 | Goods receipts | `/api/hardware/goods-receipts` | `routes/hardware/goodsReceipts.ts:25-115`: active owner/admin gate, organization/store checks, page/limit/search, explicit `grnAvailable`; joined receipt lines. |
 | Supplier invoices | `/api/hardware/supplier-invoices` | `routes/hardware/supplierInvoices.ts:331-411`: owner/admin, organization/store, page/limit/reference search; server-owned feature gate. |
+| Supplier returns | `/api/hardware/supplier-returns` | `routes/hardware/supplierReturns.ts:246-341`: active owner/admin gate, organization/store query scope, page/limit/reference search; read availability independent of write flags. |
+| Purchase rate differences | `/api/hardware/supplier-invoices/reports/rate-differences` | `routes/hardware/supplierInvoices.ts:553-678`: owner/admin, company/store scope, invoice-based page/limit; no search. |
 | Workspace recheck | `/api/startup-context` | `server.ts:608-674`: authenticated profile, its organization and that organization's stores. |
 
 The proxy still forwards only GET for those exact paths, fixed `limit=10`, validated
@@ -63,7 +66,7 @@ connection policy in `vercel.json`.
 
 ## Verification and limits
 
-- All **97 tests** pass; TypeScript covers browser/server/API code. The production build
+- All **111 tests** pass; TypeScript covers browser/server/API code. The production build
   emits `index.html`, `connection.html`, and `workspace.html`, with environment-file
   loading explicitly disabled during verification. No real key was read by the agent.
 - Ten workspace tests cover inert/consent state, real-scope selection/deselection,
@@ -106,3 +109,11 @@ See [goods-receipt contract](GOODS_RECEIPTS_READ.md).
 The supplier-invoice register adds recorded references, dates, posting/matching status,
 procurement mode, currency and total. It calculates no payable/payment balance. Known
 AP capability errors remain explicit. See [supplier invoice milestone](SUPPLIER_INVOICES_READ.md).
+
+The supplier-return register preserves existing lifecycle wording without claiming
+independent approval or received supplier credit. No write flags leave its decoder.
+See [supplier return milestone](SUPPLIER_RETURNS_READ.md).
+
+Purchase rate differences are server-calculated report values, with no local matching
+or totals. Incomplete evidence stays unavailable and empty line pages remain distinct
+from empty invoice populations. See [report milestone](PURCHASE_RATE_DIFFERENCES_READ.md).

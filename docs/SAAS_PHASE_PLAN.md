@@ -91,7 +91,7 @@ No candidate deployment URL is treated as approved.
 
 See [read-phase progress](READ_PHASE_PROGRESS.md): the owner confirms sign-in/startup/products. A
 reusable read-only workspace with scoped paging/search and fresh access checks is
-prepared locally; stock, sales invoices, goods receipts and supplier invoices are prepared; their signed-in live verification remains open. None of this establishes full production phase
+prepared locally; stock, sales invoices, goods receipts, supplier invoices and supplier returns are prepared; their signed-in live verification remains open. Phase 8 now adds the verified invoice-paged purchase rate-difference read contract, also pending signed-in deployment verification. None of this establishes full production phase
 completion or authorizes business writes.
 
 ## Boundaries and external prerequisites

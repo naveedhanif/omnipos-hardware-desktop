@@ -1,3 +1,5 @@
+import { decodeRateDifferencePage } from './rateDifferenceRead.ts';
+import { decodeSupplierReturnPage } from './supplierReturnRead.ts';
 import { decodeSupplierInvoicePage } from './supplierInvoiceRead.ts';
 import { decodeReceiptPage } from './receiptRead.ts';
 import { HardwareReadError, type ReadIdentity, type HardwareReadScope, type ProductReadQuery } from './contracts.ts';
@@ -163,6 +165,24 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
             if (q.search)
                 query.set('search', q.search);
             return decodeSupplierInvoicePage(await read(`/api/hardware/supplier-invoices?${query}`, identity, options?.signal), scope, q.page);
+        },
+        async getHardwareSupplierReturns(storeId: string, options?: ReadWindow & {
+            signal?: AbortSignal;
+        }) {
+            const identity = capture(), scope = scoped(identity, storeId);
+            const q = readWindow(options), query = new URLSearchParams({ storeId, page: String(q.page), limit: '10' });
+            if (q.search)
+                query.set('search', q.search);
+            return decodeSupplierReturnPage(await read(`/api/hardware/supplier-returns?${query}`, identity, options?.signal), scope, q.page);
+        },
+        async getHardwareRateDifferences(storeId: string, options?: ReadWindow & {
+            signal?: AbortSignal;
+        }) {
+            const identity = capture(), scope = scoped(identity, storeId), q = readWindow(options);
+            if (q.search)
+                throw new HardwareReadError('not-ready', 'Rate differences support invoice pages only.');
+            const query = new URLSearchParams({ storeId, page: String(q.page), limit: '10' });
+            return decodeRateDifferencePage(await read(`/api/hardware/supplier-invoices/reports/rate-differences?${query}`, identity, options?.signal), scope, q.page);
         },
         async getHardwareStoreCapabilities(storeId: string, options?: {
             signal?: AbortSignal;

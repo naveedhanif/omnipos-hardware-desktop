@@ -100,9 +100,11 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
                 throw new Error('Wait for the current read to finish.');
             if (!startup?.organization || !identity?.storeId)
                 throw new Error('Select an authorized Hardware store first.');
-            if (!['products', 'inventory', 'invoices', 'receipts', 'supplierInvoices'].includes(view))
+            if (!['products', 'inventory', 'invoices', 'receipts', 'supplierInvoices', 'supplierReturns', 'rateDifferences'].includes(view))
                 throw new Error('Choose a supported read-only view.');
             const q = readWindow(window), attempt = revision, storeId = identity.storeId, organizationId = identity.organizationId;
+            if (view === 'rateDifferences' && q.search)
+                throw new HardwareReadError('not-ready', 'Rate differences support invoice pages only.');
             request = new AbortController();
             busy = true;
             try {
@@ -114,7 +116,7 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
                     throw new HardwareReadError('scope-mismatch', 'The authorized company changed. Sign in again.');
                 resolveHardwareScope(fresh, storeId, revision);
                 startup = fresh;
-                if (['invoices', 'receipts', 'supplierInvoices'].includes(view) && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
+                if (['invoices', 'receipts', 'supplierInvoices', 'supplierReturns', 'rateDifferences'].includes(view) && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
                     throw new HardwareReadError('forbidden', 'Owner/admin access is required for this view.');
                 let result: ReadResult;
                 if (view === 'products')
@@ -123,6 +125,18 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
                     result = { kind: 'invoices', data: await adapter.getHardwareInvoices(storeId, { ...q, signal: request.signal }) };
                 else if (view === 'receipts')
                     result = { kind: 'receipts', data: await adapter.getHardwareGoodsReceipts(storeId, { ...q, signal: request.signal }) };
+                else if (view === 'rateDifferences') {
+                    const data = await adapter.getHardwareRateDifferences(storeId, { ...q, signal: request.signal });
+                    if (data.rows.some(r => r.currency !== fresh.stores.find(s => s.id === storeId)?.currency))
+                        throw new HardwareReadError('scope-mismatch', 'Report currency does not match the selected store.');
+                    result = { kind: 'rateDifferences', data };
+                }
+                else if (view === 'supplierReturns') {
+                    const data = await adapter.getHardwareSupplierReturns(storeId, { ...q, signal: request.signal });
+                    if (data.rows.some(r => r.currency !== fresh.stores.find(s => s.id === storeId)?.currency))
+                        throw new HardwareReadError('scope-mismatch', 'Supplier return currency does not match the selected store.');
+                    result = { kind: 'supplierReturns', data };
+                }
                 else if (view === 'supplierInvoices') {
                     const data = await adapter.getHardwareSupplierInvoices(storeId, { ...q, signal: request.signal });
                     const currency = fresh.stores.find(s => s.id === storeId)?.currency;

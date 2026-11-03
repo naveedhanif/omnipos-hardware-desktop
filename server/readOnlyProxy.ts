@@ -13,6 +13,11 @@ export interface ProxyResult {
     body: string;
 }
 const fail = (status: number, code: string): ProxyResult => ({ status, body: JSON.stringify({ error: 'Read-only connection check could not complete.', code }) });
+const capabilityCodes: Readonly<Record<string, readonly string[]>> = {
+    '/api/hardware/supplier-invoices': ['AP_FEATURE_DISABLED', 'AP_SCHEMA_UNAVAILABLE'],
+    '/api/hardware/supplier-invoices/reports/rate-differences': ['AP_FEATURE_DISABLED', 'AP_SCHEMA_UNAVAILABLE'],
+    '/api/hardware/supplier-returns': ['HARDWARE_RETURNS_UNAVAILABLE'],
+};
 export const upstreamReadTimeoutMs = 60000;
 /** Injectable fetch; tests never contact the approved deployment. */
 export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promise<ProxyResult> {
@@ -29,10 +34,11 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             method: 'GET', headers: { Authorization: input.authorization, Accept: 'application/json' },
             redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(upstreamReadTimeoutMs),
         });
-        if (!response.ok && response.status === 503 && new URL(input.path, hardwareTargets.apiOrigin).pathname === '/api/hardware/supplier-invoices' && response.headers.get('content-type')?.toLowerCase().includes('application/json')) {
-            // Preserve only two reviewed capability diagnostics, never upstream exception text.
+        const reviewedCodes = capabilityCodes[new URL(input.path, hardwareTargets.apiOrigin).pathname];
+        if (!response.ok && response.status === 503 && reviewedCodes && response.headers.get('content-type')?.toLowerCase().includes('application/json')) {
+            // Preserve only route-specific reviewed capability diagnostics, never upstream exception text.
             const body = JSON.parse(await limitedText(response, 16384));
-            if (body && body.success === false && ['AP_FEATURE_DISABLED', 'AP_SCHEMA_UNAVAILABLE'].includes(body.code)) {
+            if (body && body.success === false && reviewedCodes.includes(body.code)) {
                 const safe = fail(503, body.code);
                 return { ...safe, body: JSON.stringify({ ...JSON.parse(safe.body), ...(uuid(body.correlationId) ? { correlationId: body.correlationId } : {}) }) };
             }

@@ -140,3 +140,17 @@ The live-capable `/workspace.html` now includes owner/admin Supplier invoices wi
 manual reference search/pages and recorded statuses/totals. AP feature/schema failures
 remain explicit; no payment balance or posting is enabled. The existing configuration
 is reused. See [contract and owner check](docs/SUPPLIER_INVOICES_READ.md).
+
+## Supplier return read milestone
+
+The live-capable `/workspace.html` includes owner/admin Supplier returns with manual
+reference search/pages and recorded lifecycle/source information. Submission is not
+independent approval; credit-pending status is not supplier credit. Write flags cannot
+enable actions here. No new configuration is needed. See [contract and owner check](docs/SUPPLIER_RETURNS_READ.md).
+
+## Purchase rate-difference report
+
+The live-capable `/workspace.html` includes an owner/admin Purchase rate differences
+report. Pages cover ten qualifying invoices, with variable variance-line counts.
+Quantity, unit-rate and monetary impact remain separate; missing evidence is unavailable.
+No search, export, matching or posting is enabled. See [contract and owner check](docs/PURCHASE_RATE_DIFFERENCES_READ.md).
