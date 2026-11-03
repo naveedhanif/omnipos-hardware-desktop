@@ -106,6 +106,14 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
             const identity = capture();
             return decodeStartup(await read('/api/startup-context', identity, options?.signal), identity.userId);
         },
+        async getActiveTill(storeId: string, signal: AbortSignal) {
+            const identity = capture();
+            scoped(identity, storeId);
+            const payload = await read(`/api/hardware/till/active?${new URLSearchParams({ storeId })}`, identity, signal);
+            if (!payload || typeof payload !== 'object' || !('open' in payload) || typeof payload.open !== 'boolean')
+                throw new HardwareReadError('invalid-response', 'Invalid till response.');
+            return payload.open;
+        },
         async getHardwareProducts(storeId: string, params: ProductReadQuery = {}, options?: {
             signal?: AbortSignal;
         }) {

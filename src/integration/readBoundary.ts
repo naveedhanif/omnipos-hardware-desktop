@@ -7,6 +7,8 @@ export function allowedReadPath(path: string): boolean {
     const url = new URL(path, 'https://local.invalid');
     if (url.origin !== 'https://local.invalid')
         return false;
+    if (url.pathname === '/api/hardware/till/active')
+        return [...url.searchParams.keys()].length === 1 && uuid(url.searchParams.get('storeId'));
     if (url.pathname === '/api/startup-context')
         return !url.search;
     if (!['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices', '/api/hardware/goods-receipts', '/api/hardware/supplier-invoices', '/api/hardware/supplier-returns', '/api/hardware/supplier-invoices/reports/rate-differences'].includes(url.pathname))

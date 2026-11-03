@@ -9,7 +9,7 @@ function eligibleProducts(store: BackendStore, products: ReadProduct[]) {
     );
 }
 
-export function liveCashSaleReview(store: BackendStore, products: ReadProduct[]): string {
+export function liveCashSaleReview(store: BackendStore, products: ReadProduct[], busy: boolean): string {
     const eligible = eligibleProducts(store, products);
     if (!eligible.length) return '';
     return `<section class="access-panel" aria-labelledby="live-sale-heading">
@@ -19,6 +19,7 @@ export function liveCashSaleReview(store: BackendStore, products: ReadProduct[])
             <option value="">Choose a loaded product</option>
             ${eligible.map(product => `<option value="${esc(product.id)}">${esc(product.sku ? product.sku + ' · ' + product.name : product.name)}</option>`).join('')}
         </select></label>
+        <button type="button" class="button" id="live-check-till" ${busy ? 'disabled' : ''}>Check open till</button>
         <p id="live-sale-total" role="status"></p>
     </section>`;
 }

@@ -43,6 +43,7 @@ test('unbundled emitted API entries start in plain Node and refuse unauthenticat
             '/api/hardware/goods-receipts',
             '/api/hardware/supplier-invoices',
             '/api/hardware/supplier-returns',
+            '/api/hardware/till/active',
             '/api/hardware/supplier-invoices/reports/rate-differences',
         ];
         const entries = paths.map(path => path.slice(1) + '.ts');
@@ -60,7 +61,7 @@ test('unbundled emitted API entries start in plain Node and refuse unauthenticat
             for(const [index,url] of ${JSON.stringify(entryUrls)}.entries()) {
                 const {default:handler}=await import(url);
                 const route = ${JSON.stringify(paths)}[index];
-                const path = route === '/api/startup-context' ? route : route + '?storeId=33333333-3333-4333-8333-333333333333&page=1&limit=10';
+                const path = route === '/api/startup-context' ? route : route + '?storeId=33333333-3333-4333-8333-333333333333' + (route === '/api/hardware/till/active' ? '' : '&page=1&limit=10');
                 for(const method of ['GET','POST','PUT','PATCH','DELETE']) {
                     const headers={};let body='';
                     const res={statusCode:0,setHeader:(k,v)=>headers[k]=v,end:v=>body=v};

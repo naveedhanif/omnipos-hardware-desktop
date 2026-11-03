@@ -48,7 +48,16 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
         if (!response.headers.get('content-type')?.toLowerCase().includes('application/json'))
             return fail(502, 'UPSTREAM_INVALID_RESPONSE');
         const body = await limitedText(response);
-        JSON.parse(body);
+        const payload = JSON.parse(body);
+        const route = new URL(input.path, hardwareTargets.apiOrigin);
+        if (route.pathname === '/api/hardware/till/active') {
+            if (payload?.demoFallback !== false)
+                return fail(502, 'UPSTREAM_INVALID_RESPONSE');
+            const till = payload.session;
+            if (till !== null && (!uuid(till?.id) || till.store_id !== route.searchParams.get('storeId') || till.status !== 'open'))
+                return fail(502, 'UPSTREAM_INVALID_RESPONSE');
+            return { status: 200, body: JSON.stringify({ open: till !== null }) };
+        }
         return { status: 200, body };
     }
     catch (error) {
