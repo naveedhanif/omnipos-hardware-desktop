@@ -112,3 +112,10 @@
 .receipt-read { border: 1px solid var(--border, #dbe3df); margin: 12px 0; padding: 14px; border-radius: 6px; }
 .receipt-read summary { cursor: pointer; line-height: 1.7; }
 .receipt-read p { margin: 12px 0; }
+
+.live-read-tabs button:focus-visible{outline-offset:-3px}
+.live-session-notice{font-size:12px;color:var(--muted);line-height:1.7;padding:12px 0;border-bottom:1px solid var(--line)}
+#live-view-panel{min-width:0}
+#live-workspace .table-scroll{max-width:100%}
+#live-workspace .app-header{height:auto;min-height:65px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}
+@media(max-width:720px){#live-workspace .live-company{margin-left:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}#live-workspace .live-read-tabs button{min-height:44px}}

@@ -114,3 +114,11 @@ release requirements, not claims about the current backend.
 
 References: [OWASP Multi Tenant Security](https://cheatsheetseries.owasp.org/cheatsheets/Multi_Tenant_Security_Cheat_Sheet.html)
 and [OWASP Authorization](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html).
+
+## Phase 10 independent frontend hardening
+
+The current app-side hardening milestone adds keyboard navigation, linked result panels,
+focus restoration, visible absolute session expiry and a no-request clear-results action
+to the read-only workspace. It adds no live capability. Local keyboard behavior was
+checked with a sample-only browser harness; signed-in deployment, cross-tenant security,
+recovery, full accessibility and pilot gates remain open. See [hardening record](WORKSPACE_HARDENING.md).

@@ -23,7 +23,7 @@ schema, account or original OmniPOS changes have been made.
 | Surface | Implemented | Live evidence |
 | --- | --- | --- |
 | `/connection.html` | Existing sign-in/startup and one selected product/stock/invoice read | Owner confirms products; stock/invoice results not yet reported |
-| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/sales-invoice/receipt/supplier-invoice/supplier-return views plus purchase rate differences, paging/search, active context recheck before each read | New code remains local; 111 tests pass with fake transport |
+| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/sales-invoice/receipt/supplier-invoice/supplier-return views plus purchase rate differences, paging/search, active context recheck before each read | New code remains local; 116 tests pass with fake transport |
 | Main invoice application | Screenshot-inspired menus/forms/grid and local sample business workflows | Remains sample-only; no live records are injected into editable demo data |
 
 All eight API functions remain GET-only, with authenticated startup and the seven
@@ -70,7 +70,7 @@ No change to those original handlers was made or requested as part of this miles
 | 6–7 | Local simulations plus owner/admin read-only goods receipts, supplier invoices and supplier returns | Verified posting/financial authority and later explicit write authorization |
 | 8 | Local reports/exports plus read-only stock/invoice views and purchase rate differences | Complete authoritative reporting, performance and devices |
 | 9 | Requirements draft/readiness only | Control-plane ownership, provisioning/billing contracts and authority |
-| 10 | 111 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
+| 10 | 116 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
 
 The full production roadmap is not complete. The next phase can proceed with read-only
 browsing without claiming live write functions work. Account/store/product data have
@@ -115,3 +115,14 @@ stays unavailable. A page with no lines does not prove there are no qualifying i
 There is no search, export, matching validation or posting. See [contract and check](PURCHASE_RATE_DIFFERENCES_READ.md).
 Local checks pass; signed-in deployment verification remains outstanding. Phase 7
 finance remains gated by bounded, reconciled read contracts and write authority.
+
+## Phase 10 frontend accessibility and session hardening
+
+The read-only workspace now has roving keyboard tabs with Left/Right/Home/End,
+labelled tab panels, restored focus after context changes/reads, visible session expiry,
+a skip link, and a local Clear displayed records action. It adds no API route or
+authentication capability. The same seven read data paths/eight GET-only functions
+remain. Source inspection of stock movements (`inventory.ts:300-418`) found broader
+backend batching and numeric running balances; it was not enabled as an authoritative
+movement ledger in this milestone. Finance and SaaS control-plane gates remain open.
+See [scope and verification](WORKSPACE_HARDENING.md).

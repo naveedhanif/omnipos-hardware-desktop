@@ -154,3 +154,10 @@ The live-capable `/workspace.html` includes an owner/admin Purchase rate differe
 report. Pages cover ten qualifying invoices, with variable variance-line counts.
 Quantity, unit-rate and monetary impact remain separate; missing evidence is unavailable.
 No search, export, matching or posting is enabled. See [contract and owner check](docs/PURCHASE_RATE_DIFFERENCES_READ.md).
+
+## Read-only workspace keyboard and session controls
+
+Use Left/Right, Home and End on the workspace tabs, then Tab into the selected panel.
+After reads, focus moves to results or status. Session expiry is visible; Clear displayed
+records empties the screen without a request or sign-out. Reloading still ends the
+memory-only session. See [hardening and limits](docs/WORKSPACE_HARDENING.md).

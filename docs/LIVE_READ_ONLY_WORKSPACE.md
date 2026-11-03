@@ -66,7 +66,7 @@ connection policy in `vercel.json`.
 
 ## Verification and limits
 
-- All **111 tests** pass; TypeScript covers browser/server/API code. The production build
+- All **116 tests** pass; TypeScript covers browser/server/API code. The production build
   emits `index.html`, `connection.html`, and `workspace.html`, with environment-file
   loading explicitly disabled during verification. No real key was read by the agent.
 - Ten workspace tests cover inert/consent state, real-scope selection/deselection,
@@ -117,3 +117,9 @@ See [supplier return milestone](SUPPLIER_RETURNS_READ.md).
 Purchase rate differences are server-calculated report values, with no local matching
 or totals. Incomplete evidence stays unavailable and empty line pages remain distinct
 from empty invoice populations. See [report milestone](PURCHASE_RATE_DIFFERENCES_READ.md).
+
+Keyboard tabs now use a single tab stop with Left/Right/Home/End and labelled panels.
+After loading, focus moves to results or the safe status message; store/view selection
+restores focus to the selected control. Read-only expiry is visible in local time.
+Clear displayed records drops this page's result reference without a request, sign-out
+or change to the absolute session expiry. See [hardening details](WORKSPACE_HARDENING.md).
