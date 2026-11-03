@@ -127,3 +127,5 @@ Phase 10 now also includes safe in-memory failure-stage diagnostics and manual r
 guidance. This is local observability for an explicit attempt, not production telemetry,
 auth recovery implementation, automatic retries or release certification. See
 [diagnostic milestone](WORKSPACE_DIAGNOSTICS.md).
+
+The [read-only pilot runbook](READ_ONLY_PILOT.md) records deployment, signed-in reads, role checks and session cleanup against a specific release.
