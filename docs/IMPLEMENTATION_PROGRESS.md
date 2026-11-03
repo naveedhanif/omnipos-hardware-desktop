@@ -6,8 +6,9 @@ inside this new repository. The owner has deployed the sample frontend. The new 
 
 Current checkpoint (3 November): the owner confirms successful real sign-in, store
 selection and product reading. A separate reusable read-only workspace is now prepared
-locally, with manual search/pages, 15-minute memory session and workspace rechecks.
-All 85 tests pass; the new workspace still needs deployment and owner verification.
+locally, with manual search/pages, 15-minute memory session and workspace rechecks. The next
+Phase 6 slice now includes read-only owner/admin goods receipts with recorded lines.
+All 90 tests pass; the new workspace still needs deployment and owner verification.
 See [current read phase](READ_PHASE_PROGRESS.md). The editable invoice app remains sample-only.
 
 ## Milestone status
@@ -19,7 +20,7 @@ See [current read phase](READ_PHASE_PROGRESS.md). The editable invoice app remai
 | 3 | Provider-neutral session lifecycle with onboarding/inactive/missing-store/expiry states; demo sign-out/re-entry; local team roles, owner protection and company settings; separate consent-gated password check with memory-only session. | The complete application auth-state/provider integration, invitation delivery/acceptance, recovery and revocation tests. |
 | 4 | Local product create/edit/archive, customer/supplier edit/archive/reactivation, editable category/unit lists, stock balances/movements and validated demo adjustments. Products feed the invoice search and scoped drafts. | Stock read view prepared locally; live CRUD, atomic count/transfer/receiving authority remain open. |
 | 5 | Local invoice snapshots, sample stock changes, duplicate-reference and oversell prevention, demo till open/close, cash/card/account simulations, full demo reversal, and quotation → accepted order → invoice flow. | Owner/admin invoice register prepared locally; partial returns, real tenders/till authority, atomic checkout/refund, loyalty and unknown live outcomes. |
-| 6 | Multi-line local purchase orders, partial receipts with accepted/damaged/rejected/quarantined quantities, receipt-reference replay checks, supplier invoice draft linked to a fully received order; owner/admin demo gate. | RFQ lifecycle, authoritative GRN/discrepancy handling, matching, source-traceable liabilities and voucher/return authority. Import/Excise/Proforma stay previews. |
+| 6 | Multi-line local purchase orders, partial receipts with accepted/damaged/rejected/quarantined quantities, receipt-reference replay checks, supplier invoice draft linked to a fully received order; owner/admin demo gate; read-only goods-receipt browsing prepared with verified paging/search contract. | Deploy/verify receipt reads; RFQ lifecycle, authoritative GRN/discrepancy handling, matching, source-traceable liabilities and voucher/return authority. Import/Excise/Proforma stay previews. |
 | 7 | Local account balances and allocations; over-allocation refusal and replay protection by local reference; reasoned allocation reversal, customer statement, and retained reversal history. | Real trade ledger, payment authority, reconciliation, bills, cheque/PDC and journal contracts. |
 | 8 | Locally derived sample reports, stock value unavailable when stock is unknown, print action, selected-store CSV export, bounded all-or-nothing sample product CSV import, local JSON snapshot download and preview/confirmed same-store business restore. Four registers have filters, 20-row pages and filtered CSV export. | Authoritative server reporting/pagination, complete reporting coverage, real import contracts, print devices and production backup/recovery. |
 | 9 | Explicit SaaS readiness/control-plane boundary and disabled billing/provisioning controls. Company-scoped requirements draft with local JSON download. No invented plan, charge or entitlement. | Tenant provisioning, subscription/provider ownership, billing/webhooks, server entitlements and audited support authority. |

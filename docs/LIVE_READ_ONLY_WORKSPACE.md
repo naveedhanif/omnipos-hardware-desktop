@@ -19,7 +19,7 @@ implementation. Settings → Connection setup and the diagnostic page link to it
   sign-out. Reloading/signing out/expiry/navigation clears the session and records.
 - Choose a Hardware store from the authenticated company context. Company is read-only;
   the current backend supports one organization per profile, not a new company-switch API.
-- Browse Products, Stock balances and the owner/admin Invoice register. Selecting a
+- Browse Products, Stock balances, and the owner/admin Invoice register and Goods receipts. Selecting a
   view or store clears results and does not automatically load data.
 - Search explicitly with Load records. Previous/Next also require a deliberate click.
   Every result page has 10 records. The maximum page is 10000; search is capped at
@@ -50,6 +50,7 @@ Read-only source: `/Users/naveedhanif/Codex projects/multistore-application--mai
 | Products | `/api/hardware/products` | `src/services/hardwareService.ts:147+`, `routes/hardware/products.ts`, `hardwareProductsRuntime.ts:25-38`: `storeId`, `page`, `limit`, `search`; count and total-pages response. |
 | Stock balances | `/api/hardware/inventory/balances` | `routes/hardware/inventory.ts:165-293`: `page`, `limit`, `search`; exact decimal strings and explicit valuation availability; pagination block. |
 | Invoice register | `/api/hardware/sales/invoices` | `routes/hardware/sales.ts:583-863`: active owner/admin gate, company/store-scoped query, page/limit/search, count; excludes voided invoices. |
+| Goods receipts | `/api/hardware/goods-receipts` | `routes/hardware/goodsReceipts.ts:25-115`: active owner/admin gate, organization/store checks, page/limit/search, explicit `grnAvailable`; joined receipt lines. |
 | Workspace recheck | `/api/startup-context` | `server.ts:608-674`: authenticated profile, its organization and that organization's stores. |
 
 The proxy still forwards only GET for those exact paths, fixed `limit=10`, validated
@@ -61,7 +62,7 @@ connection policy in `vercel.json`.
 
 ## Verification and limits
 
-- All **85 tests** pass; TypeScript covers browser/server/API code. The production build
+- All **90 tests** pass; TypeScript covers browser/server/API code. The production build
   emits `index.html`, `connection.html`, and `workspace.html`, with environment-file
   loading explicitly disabled during verification. No real key was read by the agent.
 - Ten workspace tests cover inert/consent state, real-scope selection/deselection,
@@ -88,9 +89,15 @@ Push this new frontend milestone to the linked main branch. Existing Production 
 in Vercel remain sufficient; no Supabase setting change or migration is requested.
 When the deployment is Ready, open `/workspace.html`, sign in privately, choose the
 existing store, and load products. Then verify search/Next/Previous, store switching,
-stock balances and permitted invoices. Stop on a safe diagnostic rather than repeatedly
+stock balances, permitted invoices and goods receipts. Stop on a safe diagnostic rather than repeatedly
 retrying. Only report success or code/status—never credentials or business records.
 
 The agent has not committed/pushed/deployed these changes or performed a signed-in
 live request. Real checkout/posting and other production phases remain gated by the
 current no-write authorization and exact backend authority.
+
+The goods-receipt extension preserves unavailable capability separately from empty
+results and checks receipt company/store scope and joined IDs. It rejects malformed
+or oversized (over 200 lines per receipt) results without truncation. Receipt details
+expand locally from the existing list response; no detail or write route is enabled.
+See [goods-receipt contract](GOODS_RECEIPTS_READ.md).

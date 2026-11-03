@@ -126,3 +126,10 @@ Import, Excise, Cash, against Orders (standard/Import/Excise), against Receipts
 preview. Order/receipt variants include a source-selection layout; Import/Excise
 fields are provisional. All entry, save, payment and posting controls remain disabled.
 The earlier supplier invoice previews remain under Transactions → Vouchers.
+
+## Read-only purchasing milestone
+
+The separate `/workspace.html` now includes owner/admin Goods receipts, manual search
+and pages, and expandable recorded receipt lines. Missing backend GRN capability is
+shown explicitly as unavailable. Receiving and posting stay disabled. No new settings
+or database change is requested. See [verified contract and deployment check](docs/GOODS_RECEIPTS_READ.md).

@@ -11,6 +11,7 @@ export interface WorkspaceSummary {
     stores: BackendStore[];
     storeId: string | null;
     canReadInvoices: boolean;
+    canReadPurchasing: boolean;
     expiresAt: number;
 }
 /** Memory-only, manual reads. No auth refresh, background fetch, storage, retries or writes. */
@@ -44,7 +45,7 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
         }
         if (!startup?.organization)
             return null;
-        return structuredClone({ company: startup.organization.name, stores: startup.stores.filter(s => s.business_type === 'hardware'), storeId: identity?.storeId ?? null, canReadInvoices: ['owner', 'admin'].includes(startup.profile!.role.toLowerCase()), expiresAt: session.expiresAt });
+        return structuredClone({ company: startup.organization.name, stores: startup.stores.filter(s => s.business_type === 'hardware'), storeId: identity?.storeId ?? null, canReadPurchasing: ['owner', 'admin'].includes(startup.profile!.role.toLowerCase()), canReadInvoices: ['owner', 'admin'].includes(startup.profile!.role.toLowerCase()), expiresAt: session.expiresAt });
     }
     return {
         clear, summary,
@@ -99,7 +100,7 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
                 throw new Error('Wait for the current read to finish.');
             if (!startup?.organization || !identity?.storeId)
                 throw new Error('Select an authorized Hardware store first.');
-            if (!['products', 'inventory', 'invoices'].includes(view))
+            if (!['products', 'inventory', 'invoices', 'receipts'].includes(view))
                 throw new Error('Choose a supported read-only view.');
             const q = readWindow(window), attempt = revision, storeId = identity.storeId, organizationId = identity.organizationId;
             request = new AbortController();
@@ -113,13 +114,15 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
                     throw new HardwareReadError('scope-mismatch', 'The authorized company changed. Sign in again.');
                 resolveHardwareScope(fresh, storeId, revision);
                 startup = fresh;
-                if (view === 'invoices' && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
-                    throw new HardwareReadError('forbidden', 'Invoice access is no longer available.');
+                if ((view === 'invoices' || view === 'receipts') && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
+                    throw new HardwareReadError('forbidden', 'Owner/admin access is required for this view.');
                 let result: ReadResult;
                 if (view === 'products')
                     result = { kind: 'products', data: await adapter.getHardwareProducts(storeId, { page: q.page, limit: 10, search: q.search }, { signal: request.signal }) };
                 else if (view === 'invoices')
                     result = { kind: 'invoices', data: await adapter.getHardwareInvoices(storeId, { ...q, signal: request.signal }) };
+                else if (view === 'receipts')
+                    result = { kind: 'receipts', data: await adapter.getHardwareGoodsReceipts(storeId, { ...q, signal: request.signal }) };
                 else {
                     const data = await adapter.getHardwareInventoryBalances(storeId, { ...q, signal: request.signal });
                     if (data.currency !== null && data.currency !== fresh.stores.find(s => s.id === storeId)?.currency)

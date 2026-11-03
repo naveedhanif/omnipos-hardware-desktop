@@ -23,10 +23,10 @@ schema, account or original OmniPOS changes have been made.
 | Surface | Implemented | Live evidence |
 | --- | --- | --- |
 | `/connection.html` | Existing sign-in/startup and one selected product/stock/invoice read | Owner confirms products; stock/invoice results not yet reported |
-| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/invoice views, paging/search, active context recheck before each read | New code remains local; 85 tests pass with fake transport |
+| `/workspace.html` | Reusable memory session, company/store context, manual products/stock/invoice/receipt views, paging/search, active context recheck before each read | New code remains local; 90 tests pass with fake transport |
 | Main invoice application | Screenshot-inspired menus/forms/grid and local sample business workflows | Remains sample-only; no live records are injected into editable demo data |
 
-All four API functions remain GET-only, with authenticated startup and the three
+All five API functions remain GET-only, with authenticated startup and the four
 verified data paths. Fixed `limit=10`; pages 1–10000 and conservative literal search
 are now allowed for the manual workspace. The one-read probe itself still requests
 only one first page. No writes, retries, polling, seed, bootstrap, contact queries,
@@ -41,6 +41,9 @@ Original source HEAD rechecked: `b1e70d8dc52cb980a9c6cbf056ac24d0bb794930`.
   customer list and is not verified by `verifyHardwareStore` in that handler. There
   is no page/limit response contract. Directory scope/permission policy and a minimal
   bounded response need review before enabling it here.
+- Purchase-order list (`routes/hardware/purchaseOrders.ts:32-110`) is owner/admin and
+  store checked but has no pagination/search contract. Adding query parameters here
+  would not bound that backend query. It stays disabled pending a bounded contract.
 - Supplier list (`routes/hardware/suppliers.ts:587-663`) enforces owner/admin and
   organization/store checks but returns an unpaginated enriched list with contacts,
   documents and contracts. No verified paged/minimal list contract has been added.
@@ -60,12 +63,21 @@ No change to those original handlers was made or requested as part of this miles
 | 3 | Owner-confirmed sign-in/startup; reusable read-only session prepared locally | Deploy/test new session UI; complete auth/recovery/invitations and revocation coverage |
 | 4 | Owner-confirmed product read; stock browsing/search/pages prepared | Verify stock live; contact contracts; CRUD/receiving need write authority |
 | 5 | Owner/admin invoice browsing/search/pages prepared; local sales/till/quotation flows | Verify invoice reads; real checkout/tenders/refunds remain prohibited |
-| 6–7 | Local purchasing, receiving and allocation/reversal simulations | Verified posting/financial authority and later explicit write authorization |
+| 6–7 | Local simulations plus owner/admin read-only goods receipts with recorded lines | Verified posting/financial authority and later explicit write authorization |
 | 8 | Local reports/exports plus bounded read-only stock/invoice views | Complete authoritative reporting, performance and devices |
 | 9 | Requirements draft/readiness only | Control-plane ownership, provisioning/billing contracts and authority |
-| 10 | 85 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
+| 10 | 90 tests, TypeScript/build and unbundled runtime checks pass; deployed guard verified | New deployment, signed-in role/isolation/recovery/pilot evidence |
 
 The full production roadmap is not complete. The next phase can proceed with read-only
 browsing without claiming live write functions work. Account/store/product data have
 not been copied into this repository. Supabase and database operations remain the
 owner's responsibility.
+
+## Purchasing read milestone
+
+The next Phase 6 slice adds owner/admin goods receipts to `/workspace.html`, with
+manual search/pages and expandable recorded lines. It rechecks membership and role
+before each read and validates returned company/store IDs. Missing GRN capability
+is displayed as unavailable, not zero receipts. No receiving or posting is enabled.
+See [contract, verification and owner check](GOODS_RECEIPTS_READ.md). This addition
+has local test/build evidence only; signed-in deployment verification remains open.
