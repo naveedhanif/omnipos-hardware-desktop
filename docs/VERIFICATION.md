@@ -222,3 +222,28 @@ This is module initialization failure before any handler/backend/database call.
 The repair remains local until published. Still required: deploy it, observe startup
 401/JSON with no credentials, then verify owner-driven sign-in/products. No signed-in
 connectivity, issuer matching, database behavior or production isolation is claimed.
+
+## Read-only stock/invoice preparation and startup timeout diagnosis
+
+3 November 2026. Deployed missing-token startup now returns `SESSION_REQUIRED`; Vercel
+request logs show HTTP 401. The owner reported seeing sample data. Inspecting their
+separate connection tab showed the startup read error, not live product results.
+Vercel records that owner-started request as 502, duration 15.25 seconds, cache BYPASS.
+This is consistent with the previous 15-second timeout; the underlying latency cause
+is unverified. No credentials, environment contents or real business records were read.
+
+Implemented a one-attempt 60-second proxy read / 70-second browser read, distinct safe
+timeout diagnostics, first-page exact stock-balance view and owner/admin invoice
+register. All allow-listed business routes remain GET-only, page 1 / limit 10, with
+memory-only results and no automatic retry. There is no contact, seed, export, write,
+transaction, billing, provisioning or database proxy. The main invoice app remains
+sample-only. New functions use the repaired explicit-import/extension-emission setup.
+
+All **71 tests**, TypeScript, and the environment-free production build pass. The
+unbundled runtime test covers all four function entries and zero-fetch refusal of
+missing credentials/write methods. Stock/invoice contracts, exact values, unknowns,
+role/currency/scope/expiry, fallback rejection, safe UI escaping and diagnostics are
+covered by fake responses. The stock view was inspected with synthetic layout data.
+The new code has not been deployed, and no stock/invoice request was made live by the
+agent. See `READ_PHASE_PROGRESS.md` for exact remaining gates and customer/supplier
+contract limitations discovered through read-only original-source inspection.

@@ -35,7 +35,7 @@ export function createBrowserCheckPorts(config: ConnectionConfig, fetcher: typeo
             if (request.method !== 'GET' || !allowedReadPath(request.url))
                 throw new Error('Only the two approved read paths are available.');
             const response = await fetcher(request.url, { method: 'GET', headers: { ...request.headers, Accept: 'application/json' },
-                credentials: 'omit', redirect: 'error', cache: 'no-store', signal: request.signal ? AbortSignal.any([request.signal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000) });
+                credentials: 'omit', redirect: 'error', cache: 'no-store', signal: request.signal ? AbortSignal.any([request.signal, AbortSignal.timeout(70000)]) : AbortSignal.timeout(70000) });
             if (!response.headers.get('content-type')?.toLowerCase().includes('application/json'))
                 throw new Error('The read-only API did not return JSON.');
             return { status: response.status, body: await limitedText(response) };

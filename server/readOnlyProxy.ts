@@ -12,6 +12,7 @@ export interface ProxyResult {
     body: string;
 }
 const fail = (status: number, code: string): ProxyResult => ({ status, body: JSON.stringify({ error: 'Read-only connection check could not complete.', code }) });
+export const upstreamReadTimeoutMs = 60000;
 /** Injectable fetch; tests never contact the approved deployment. */
 export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promise<ProxyResult> {
     if (input.method !== 'GET')
@@ -25,7 +26,7 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
     try {
         const response = await fetcher(hardwareTargets.apiOrigin + input.path, {
             method: 'GET', headers: { Authorization: input.authorization, Accept: 'application/json' },
-            redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(15000),
+            redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(upstreamReadTimeoutMs),
         });
         if (!response.ok)
             return fail([401, 403, 404, 429, 503].includes(response.status) ? response.status : 502, 'UPSTREAM_READ_REFUSED');
@@ -35,8 +36,8 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
         JSON.parse(body);
         return { status: 200, body };
     }
-    catch {
-        return fail(502, 'UPSTREAM_READ_UNCONFIRMED');
+    catch (error) {
+        return fail(502, error instanceof Error && error.name === 'TimeoutError' ? 'UPSTREAM_READ_TIMEOUT' : 'UPSTREAM_READ_UNCONFIRMED');
     }
 }
 export async function readOnlyHandler(req: IncomingMessage, res: ServerResponse) {

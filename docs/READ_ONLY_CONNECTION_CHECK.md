@@ -1,6 +1,8 @@
 # Existing OmniPOS read-only connection check
 
-## Current deployment gate — 3 November 2026
+Current follow-up: [read-phase progress](READ_PHASE_PROGRESS.md) records the repaired deployed guard, the owner’s subsequent 502 startup failure, the local timeout mitigation and the new stock/invoice read scope. Earlier sections below are the initial implementation/repair record.
+
+## Deployment import repair record — 3 November 2026
 
 The owner deployed commit `52ef465`. The production connection page loads and passes
 its configuration gate. An unauthenticated GET to its `/api/startup-context` function

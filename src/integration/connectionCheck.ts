@@ -1,6 +1,8 @@
 import { createHardwareReadAdapter, type ReadRequest, type ReadResponse } from './hardwareReadAdapter.ts';
 import { resolveHardwareScope } from './decoders.ts';
 import type { ReadIdentity, ReadProductPage, StartupContext } from './contracts.ts';
+import type { InventoryPage } from './inventoryRead.ts';
+import type { InvoicePage } from './invoiceRead.ts';
 export interface CheckSession {
     userId: string;
     accessToken: string;
@@ -11,7 +13,7 @@ export interface CheckPorts {
     transport(request: ReadRequest): Promise<ReadResponse>;
     now?(): number;
 }
-/** One explicit sign-in + startup, then one product read per sign-in. No storage or retries. */
+/** One explicit sign-in + startup, then one selected read per sign-in. No storage or retries. */
 export function createConnectionCheck(ports: CheckPorts) {
     let revision = 0, identity: ReadIdentity | null = null, session: CheckSession | null = null;
     let startup: StartupContext | null = null, controller: AbortController | null = null;
@@ -20,6 +22,20 @@ export function createConnectionCheck(ports: CheckPorts) {
     const adapter = createHardwareReadAdapter({ enabled: true, getIdentity: () => identity,
         getSession: async () => session && session.expiresAt > now() ? session : null, transport: ports.transport });
     function clear() { ++revision; controller?.abort(); controller = null; identity = null; session = null; startup = null; consumed = false; }
+    async function runRead<T>(storeId: string, load: (signal: AbortSignal) => Promise<T>): Promise<T> {
+        if (!startup || !session || consumed)
+            throw new Error('Start a new check before reading another view.');
+        identity = resolveHardwareScope(startup, storeId, ++revision);
+        const attempt = revision;
+        consumed = true;
+        try {
+            return await load(controller!.signal);
+        }
+        finally {
+            if (attempt === revision)
+                clear();
+        }
+    }
     return {
         clear,
         async signIn(email: string, password: string, consent: boolean) {
@@ -40,7 +56,7 @@ export function createConnectionCheck(ports: CheckPorts) {
                 if (context.profile?.is_active !== true || !context.organization || !context.stores.some(s => s.business_type === 'hardware'))
                     throw new Error('An active account with an existing Hardware store is required.');
                 startup = context;
-                return structuredClone({ organization: context.organization, stores: context.stores.filter(s => s.business_type === 'hardware') });
+                return structuredClone({ organization: context.organization, stores: context.stores.filter(s => s.business_type === 'hardware'), canReadInvoices: ['owner', 'admin'].includes(context.profile.role.toLowerCase()) });
             }
             catch (error) {
                 if (attempt === revision)
@@ -49,18 +65,21 @@ export function createConnectionCheck(ports: CheckPorts) {
             }
         },
         async products(storeId: string): Promise<ReadProductPage> {
-            if (!startup || !session || consumed)
-                throw new Error('Start a new check before reading products again.');
-            identity = resolveHardwareScope(startup, storeId, ++revision);
-            const attempt = revision;
-            consumed = true;
-            try {
-                return await adapter.getHardwareProducts(storeId, { page: 1, limit: 10 }, { signal: controller!.signal });
-            }
-            finally {
-                if (attempt === revision)
-                    clear();
-            }
+            return runRead(storeId, signal => adapter.getHardwareProducts(storeId, { page: 1, limit: 10 }, { signal }));
+        },
+        async invoices(storeId: string): Promise<InvoicePage> {
+            if (!startup?.profile || !['owner', 'admin'].includes(startup.profile.role.toLowerCase()))
+                throw new Error('Owner or administrator access is required for the invoice register.');
+            return runRead(storeId, signal => adapter.getHardwareInvoices(storeId, { signal }));
+        },
+        async inventory(storeId: string): Promise<InventoryPage> {
+            const currency = startup?.stores.find(store => store.id === storeId)?.currency;
+            return runRead(storeId, async (signal) => {
+                const result = await adapter.getHardwareInventoryBalances(storeId, { signal });
+                if (result.currency !== null && result.currency !== currency)
+                    throw new Error('Inventory currency does not match the authorized store.');
+                return result;
+            });
         },
     };
 }

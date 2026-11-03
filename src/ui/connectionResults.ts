@@ -1,0 +1,24 @@
+import type { BackendStore, ReadProductPage } from '../integration/contracts.ts';
+import type { InventoryPage } from '../integration/inventoryRead.ts';
+import type { InvoicePage } from '../integration/invoiceRead.ts';
+import { escapeHtml as esc } from './html.ts';
+export type ConnectionResult = {
+    kind: 'products';
+    data: ReadProductPage;
+} | {
+    kind: 'inventory';
+    data: InventoryPage;
+} | {
+    kind: 'invoices';
+    data: InvoicePage;
+};
+export function connectionResults(result: ConnectionResult, company: string, store: BackendStore | null): string {
+    const data = result.data, scope = `<p>${esc(company)} / ${esc(store?.name)} / ${esc(store?.currency)}</p>`;
+    const footer = `<p>Page 1 of ${data.totalPages}. Results stay in memory; no records were saved or changed. Start a new check for another view.</p>`;
+    if (result.kind === 'products')
+        return `<section><h2>Read-only product results</h2>${scope}<p>Showing ${result.data.products.length} of ${data.total} products reported by the backend.</p><div class="table-scroll"><table class="section-table"><thead><tr><th>SKU</th><th>Product</th><th>Unit</th><th>Stock</th><th>Cost</th><th>Sell price</th></tr></thead><tbody>${result.data.products.map(p => `<tr><td>${esc(p.sku ?? 'Not recorded')}</td><td>${esc(p.name)}</td><td>${esc(p.uom ?? 'Not recorded')}</td><td>${p.stock_qty ?? 'Unknown'}</td><td>${p.cost_price ?? 'Unknown'}</td><td>${p.sell_price ?? 'Unknown'}</td></tr>`).join('') || '<tr><td colspan="6">No products returned for this store.</td></tr>'}</tbody></table></div>${footer}</section>`;
+    if (result.kind === 'invoices')
+        return `<section><h2>Read-only invoice register</h2>${scope}<p>Showing ${result.data.rows.length} of ${data.total} non-voided invoices reported by the backend. Amounts are shown as returned; no net revenue, payment balance or profit is calculated.</p><div class="table-scroll"><table class="section-table"><thead><tr><th>Reference</th><th>Date</th><th>Status</th><th>Tender</th><th>Subtotal</th><th>Tax</th><th>Recorded total</th></tr></thead><tbody>${result.data.rows.map(r => `<tr><td>${esc(r.reference ?? 'Not recorded')}</td><td>${esc(r.date ?? 'Not recorded')}</td><td>${esc(r.status ?? 'Not recorded')}</td><td>${esc(r.tender ?? 'Not recorded')}</td><td>${esc(r.subtotal ?? 'Unavailable')}</td><td>${esc(r.tax ?? 'Unavailable')}</td><td>${esc(r.total ?? 'Unavailable')}</td></tr>`).join('') || '<tr><td colspan="7">No invoices returned for this store.</td></tr>'}</tbody></table></div>${footer}</section>`;
+    const rows = result.data.rows;
+    return `<section><h2>Read-only stock balances</h2>${scope}<p>Showing ${rows.length} of ${data.total} balance records by product and location, as reported by the backend. These are not product totals or a complete stock valuation.</p><p>Valuation currency: ${esc(result.data.currency ?? 'Unavailable')}. Exact backend decimal text is preserved.</p><div class="table-scroll"><table class="section-table"><thead><tr><th>SKU / product</th><th>Location / bin</th><th>Quantity</th><th>Unit</th><th>Average cost</th><th>Balance value</th><th>Stock status</th><th>Valuation</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.sku || 'Not recorded')}<br>${esc(r.name || 'Product unavailable')}</td><td>${esc(r.locationName ?? 'Location unavailable')}<br>${esc(r.bin ?? '')}</td><td>${esc(r.quantity ?? 'Unknown')}</td><td>${esc(r.unit ?? 'Not recorded')}</td><td>${esc(r.averageCost ?? 'Unavailable')}</td><td>${esc(r.value ?? 'Unavailable')}</td><td>${esc(r.stockStatus)}${r.stockReason ? `<br>${esc(r.stockReason.replaceAll('_', ' '))}` : ''}</td><td>${esc(r.valuationStatus)}${r.valuationIssue ? `<br>${esc(r.valuationIssue.replaceAll('_', ' '))}` : ''}</td></tr>`).join('') || '<tr><td colspan="8">No balance records returned for this store.</td></tr>'}</tbody></table></div>${footer}</section>`;
+}

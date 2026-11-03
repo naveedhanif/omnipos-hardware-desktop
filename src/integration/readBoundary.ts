@@ -8,7 +8,7 @@ export function allowedReadPath(path: string): boolean {
         return false;
     if (url.pathname === '/api/startup-context')
         return !url.search;
-    if (url.pathname !== '/api/hardware/products')
+    if (!['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices'].includes(url.pathname))
         return false;
     const keys = [...url.searchParams.keys()];
     return keys.length === 3 && new Set(keys).size === 3 && keys.every(k => ['storeId', 'page', 'limit'].includes(k)) &&

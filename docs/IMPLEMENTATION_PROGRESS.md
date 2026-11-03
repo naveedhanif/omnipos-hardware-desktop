@@ -4,11 +4,11 @@ Updated 3 November 2026. The app remains **a local sample application**. All cha
 inside this new repository. The owner has deployed the sample frontend. The new isolated auth/read check is prepared locally but has not been deployed or live-verified by the agent.
 "Working locally" below is not completion of the corresponding production phase.
 
-Current gate (3 November): the owner deployed the isolated check, but its startup
-function fails module loading on Vercel. A local import/emission repair reproduces and
-fixes the failure with an unbundled Node test; all 59 tests pass. Deploy/recheck is still
-required before real sign-in/products can be called verified. See
-[current connection status](READ_ONLY_CONNECTION_CHECK.md#current-deployment-gate--3-november-2026).
+Current gate (3 November): the deployed proxy import repair now returns 401 JSON for
+missing credentials. The owner's signed-in startup attempt returns HTTP 502 after
+15.25 seconds. A local timeout/diagnostic mitigation and additional read-only stock
+and invoice views pass all 71 tests, but are not deployed/live-verified. See
+[current read-phase progress](READ_PHASE_PROGRESS.md). The main workspace remains sample-only.
 
 ## Milestone status
 
@@ -17,8 +17,8 @@ required before real sign-in/products can be called verified. See
 | 1 | Company/store context, scoped services and drafts, switch cleanup, two companies/three stores. | Production tenant enforcement. |
 | 2 | Source contract audit, 210 literal route declarations, read adapters, fake-transport tests and an opt-in, isolated auth/product check with GET-only Vercel proxy functions (not yet deployed/live-verified). | Confirmed target and live compatibility/security verification. |
 | 3 | Provider-neutral session lifecycle with onboarding/inactive/missing-store/expiry states; demo sign-out/re-entry; local team roles, owner protection and company settings; separate consent-gated password check with memory-only session. | The complete application auth-state/provider integration, invitation delivery/acceptance, recovery and revocation tests. |
-| 4 | Local product create/edit/archive, customer/supplier edit/archive/reactivation, editable category/unit lists, stock balances/movements and validated demo adjustments. Products feed the invoice search and scoped drafts. | Live CRUD, atomic count/transfer/receiving authority. |
-| 5 | Local invoice snapshots, sample stock changes, duplicate-reference and oversell prevention, demo till open/close, cash/card/account simulations, full demo reversal, and quotation → accepted order → invoice flow. | Partial returns, real tenders/till authority, atomic checkout/refund, loyalty and unknown live outcomes. |
+| 4 | Local product create/edit/archive, customer/supplier edit/archive/reactivation, editable category/unit lists, stock balances/movements and validated demo adjustments. Products feed the invoice search and scoped drafts. | Stock read view prepared locally; live CRUD, atomic count/transfer/receiving authority remain open. |
+| 5 | Local invoice snapshots, sample stock changes, duplicate-reference and oversell prevention, demo till open/close, cash/card/account simulations, full demo reversal, and quotation → accepted order → invoice flow. | Owner/admin invoice register prepared locally; partial returns, real tenders/till authority, atomic checkout/refund, loyalty and unknown live outcomes. |
 | 6 | Multi-line local purchase orders, partial receipts with accepted/damaged/rejected/quarantined quantities, receipt-reference replay checks, supplier invoice draft linked to a fully received order; owner/admin demo gate. | RFQ lifecycle, authoritative GRN/discrepancy handling, matching, source-traceable liabilities and voucher/return authority. Import/Excise/Proforma stay previews. |
 | 7 | Local account balances and allocations; over-allocation refusal and replay protection by local reference; reasoned allocation reversal, customer statement, and retained reversal history. | Real trade ledger, payment authority, reconciliation, bills, cheque/PDC and journal contracts. |
 | 8 | Locally derived sample reports, stock value unavailable when stock is unknown, print action, selected-store CSV export, bounded all-or-nothing sample product CSV import, local JSON snapshot download and preview/confirmed same-store business restore. Four registers have filters, 20-row pages and filtered CSV export. | Authoritative server reporting/pagination, complete reporting coverage, real import contracts, print devices and production backup/recovery. |

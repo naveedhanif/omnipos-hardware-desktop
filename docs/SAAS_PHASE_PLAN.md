@@ -87,6 +87,13 @@ read-only [separate frontend connection audit](SEPARATE_FRONTEND_CONNECTION.md) 
 source evidence and precise public configuration values required before any live wiring.
 No candidate deployment URL is treated as approved.
 
+## Current read-integration checkpoint
+
+See [read-phase progress](READ_PHASE_PROGRESS.md): the deployed missing-session guard
+works; owner startup currently fails with 502. Stock and owner/admin invoice reads plus
+safer diagnostics are prepared locally. None of this establishes full production phase
+completion or authorizes business writes.
+
 ## Boundaries and external prerequisites
 
 All code changes stay in this repository. Current OmniPOS source inspection is read-only.

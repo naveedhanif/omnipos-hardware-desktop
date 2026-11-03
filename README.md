@@ -25,6 +25,7 @@ Phase 2 adds the [backend/session audit](docs/PHASE_2_BACKEND_CONTRACT_AUDIT.md)
 layer tested with fake responses. The editable app still uses sample data. A separate
 [read-only connection screen](docs/READ_ONLY_CONNECTION_CHECK.md) now has restricted
 auth/read transport; it makes no request until explicit consent and user action.
+See [current read-phase status](docs/READ_PHASE_PROGRESS.md) for deployed guard evidence, the owner startup failure and remaining gates.
 The existing verified startup contract returns one organization per authenticated profile;
 production multi-company membership must not be inferred from the demo switcher.
 
@@ -46,7 +47,7 @@ read [connection configuration](docs/CONNECTION_CONFIGURATION.md). The root
 never copy the old application's environment file or enter server secrets here.
 The [implemented check](docs/READ_ONLY_CONNECTION_CHECK.md) uses these public values
 after deployment. It supports explicit existing-account sign-in, startup context and
-one product page through two Vercel GET-only functions. No request runs merely on
+one selected products, stock-balances or owner/admin invoice page through four Vercel GET-only functions. No request runs merely on
 page load. Live verification has not been performed; transaction posting stays disabled.
 
 ## Try it
