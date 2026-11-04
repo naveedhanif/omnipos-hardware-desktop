@@ -1,3 +1,4 @@
+import { clearTransactionDrafts, saveTransactionDraft, transactionDraftView } from './ui/transactionDrafts';
 import './styles.css';
 import { reportWorkspace } from './ui/reportWorkspace';
 import { buildDemoReport, defaultReportQuery, type DemoReportQuery } from './services/demoReports';
@@ -81,7 +82,7 @@ function shell() {
 }
 function extendedWorkspace(name: string) {
     try {
-        return administrationView(name, context, administration) ?? catalogueAdministration(name, businessService) ?? salesDocumentsView(name, salesDocuments) ?? reportWorkspace(name, businessService, reportQueries.get(name) ?? { ...defaultReportQuery }) ?? purchaseWorkspace(name, businessService) ?? financeWorkspace(name, businessService, statementCustomer) ?? businessWorkspace(name, businessService, editingProductId) ?? workspacePreview(name, workspaceService);
+        return administrationView(name, context, administration) ?? catalogueAdministration(name, businessService) ?? salesDocumentsView(name, salesDocuments) ?? reportWorkspace(name, businessService, reportQueries.get(name) ?? { ...defaultReportQuery }) ?? purchaseWorkspace(name, businessService) ?? financeWorkspace(name, businessService, statementCustomer) ?? businessWorkspace(name, businessService, editingProductId) ?? transactionDraftView(name, workspaceKey(context), businessService.canPurchase()) ?? workspacePreview(name, workspaceService);
     }
     catch {
         return '<div class="page-heading"><h1>Local data unavailable</h1></div><p role="alert">This workspace data could not be read. No changes were made. Keep the local data for support. Snapshot restore is not enabled.</p>';
@@ -260,6 +261,16 @@ async function showResults(q: string) {
     }
 }
 function bind() {
+    document.querySelector<HTMLFormElement>('#transaction-draft')?.addEventListener('submit', event => {
+        event.preventDefault();
+        try {
+            saveTransactionDraft(documentTab, workspaceKey(context), new FormData(event.currentTarget as HTMLFormElement));
+            shell();
+            notify('Sample draft saved.');
+        } catch (error) {
+            notify(error instanceof Error ? error.message : 'Unable to save the sample draft.');
+        }
+    });
     document.querySelector('#preview-search')?.addEventListener('input', e => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLTableRowElement>('.workspace-preview tbody tr').forEach(row => { row.hidden = !row.textContent?.toLowerCase().includes(q); }); });
     document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('.document-form [name], #section-panel [name]').forEach(e => e.addEventListener('change', () => {
         if (e instanceof HTMLInputElement && !e.checkValidity()) {
@@ -319,6 +330,7 @@ app.addEventListener('click', e => {
         else {
             if (dirty && !confirm('End this demo session and discard unsaved edits?'))
                 return;
+            clearTransactionDrafts();
             demoSession = target.dataset.demoSession === 'expire' ? 'expired' : 'signed-out';
             ++searchRevision;
             ++catalogRevision;
