@@ -124,3 +124,8 @@
 .workspace-diagnostic summary{font-weight:600}
 .workspace-diagnostic p{font-size:12px;color:var(--muted)}
 .workspace-diagnostic pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.7;background:var(--soft);padding:12px;max-width:100%}
+
+.document-tab{display:flex;flex:none;align-items:stretch}
+.document-tab [role=tab]{padding-inline-end:8px}
+.document-tab button.document-tab-close{align-self:center;justify-content:center;width:28px;height:28px;padding:0;font-size:17px;border-radius:4px}
+.document-tab-close:hover{background:var(--soft);color:var(--ink)}

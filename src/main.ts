@@ -73,7 +73,7 @@ function shell() {
         return;
     }
     const tabScroll = document.querySelector('.section-tabs')?.scrollLeft ?? 0;
-    app.innerHTML = `<a class="skip" href="#workspace">Skip to workspace</a><header class="app-header"><a href="/" class="brand"><span class="brand-mark">${icon('box')}</span><strong>omni<span>pos</span></strong><span class="brand-divider"></span><span class="hardware-label">Hardware</span></a>${workspaceSwitcher(context)}<button class="avatar" data-action="operator" aria-label="Sample operator details">SA</button></header><nav class="menubar" aria-label="Application menu">${Object.keys(appMenus).map(n => `<div class="menu-wrap"><button class="menu-trigger" aria-expanded="false">${n}${['Masters', 'Transactions', 'Reports'].includes(n) ? icon('down') : ''}</button><div class="menu" hidden>${menuMarkup(appMenus[n], n.toLowerCase())}</div></div>`).join('')}<span class="keyboard-hint">A workspace built for your counter.</span></nav><div class="document-bar"><div class="document-tabs" role="tablist" aria-label="Open documents">${openDocuments.map(n => `<button role="tab" aria-selected="${documentTab === n}" data-doc="${esc(n)}">${icon(n === 'Sales invoice' ? 'file' : 'box')}${esc(n)}${n === 'Sales invoice' ? '<span class="tab-count">1</span>' : ''}</button>`).join('')}</div><span class="offline">Sample data only</span></div><div class="workspace-layout"><aside class="rail" aria-label="Quick navigation"><button data-doc="Sales invoice" class="${documentTab === 'Sales invoice' ? 'selected' : ''}" aria-label="Sales invoice">${icon('file')}</button><button data-doc="Item catalogue" class="${documentTab === 'Item catalogue' ? 'selected' : ''}" aria-label="Item catalogue">${icon('box')}</button><div class="rail-spacer"></div><button data-action="help" aria-label="Keyboard shortcuts">${icon('help')}</button></aside><main id="workspace">${documentTab === 'Sales invoice' ? invoice() : documentTab === 'Item catalogue' ? catalogue() : extendedWorkspace(documentTab)}</main></div><footer class="statusbar"><span>${icon('check')} Local prototype</span><span>${esc(workspaceDetails(context).organization.name)} / ${esc(workspaceDetails(context).store.name)}</span><span>No backend connected</span><span class="status-end">KWD <span class="status-separator">|</span> 3 decimal places</span></footer><div id="notice" class="notice" role="status" hidden></div>`;
+    app.innerHTML = `<a class="skip" href="#workspace">Skip to workspace</a><header class="app-header"><a href="/" class="brand"><span class="brand-mark">${icon('box')}</span><strong>omni<span>pos</span></strong><span class="brand-divider"></span><span class="hardware-label">Hardware</span></a>${workspaceSwitcher(context)}<button class="avatar" data-action="operator" aria-label="Sample operator details">SA</button></header><nav class="menubar" aria-label="Application menu">${Object.keys(appMenus).map(n => `<div class="menu-wrap"><button class="menu-trigger" aria-expanded="false">${n}${['Masters', 'Transactions', 'Reports'].includes(n) ? icon('down') : ''}</button><div class="menu" hidden>${menuMarkup(appMenus[n], n.toLowerCase())}</div></div>`).join('')}<span class="keyboard-hint">A workspace built for your counter.</span></nav><div class="document-bar"><div class="document-tabs" role="tablist" aria-label="Open documents">${openDocuments.map(n => `<div class="document-tab" role="presentation"><button type="button" role="tab" aria-selected="${documentTab === n}" data-doc="${esc(n)}">${icon(n === 'Sales invoice' ? 'file' : 'box')}${esc(n)}${n === 'Sales invoice' ? '<span class="tab-count">1</span>' : ''}</button><button type="button" class="document-tab-close" data-close-doc="${esc(n)}" aria-label="Close ${esc(n)}" title="Close ${esc(n)}">×</button></div>`).join('')}</div><span class="offline">Sample data only</span></div><div class="workspace-layout"><aside class="rail" aria-label="Quick navigation"><button data-doc="Sales invoice" class="${documentTab === 'Sales invoice' ? 'selected' : ''}" aria-label="Sales invoice">${icon('file')}</button><button data-doc="Item catalogue" class="${documentTab === 'Item catalogue' ? 'selected' : ''}" aria-label="Item catalogue">${icon('box')}</button><div class="rail-spacer"></div><button data-action="help" aria-label="Keyboard shortcuts">${icon('help')}</button></aside><main id="workspace">${documentTab === 'Sales invoice' ? invoice() : documentTab === 'Item catalogue' ? catalogue() : documentTab ? extendedWorkspace(documentTab) : '<div class="empty-state"><p>No documents open.</p><button type="button" class="button" data-doc="Sales invoice">Open sales invoice</button></div>'}</main></div><footer class="statusbar"><span>${icon('check')} Local prototype</span><span>${esc(workspaceDetails(context).organization.name)} / ${esc(workspaceDetails(context).store.name)}</span><span>No backend connected</span><span class="status-end">KWD <span class="status-separator">|</span> 3 decimal places</span></footer><div id="notice" class="notice" role="status" hidden></div>`;
     bind();
     const tabs = document.querySelector('.section-tabs');
     if (tabs)
@@ -111,6 +111,25 @@ function switchDoc(n: string) {
     history.replaceState(null, '', url);
     shell();
     document.querySelector<HTMLElement>('.document-tabs [aria-selected="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+function closeDoc(name: string) {
+    const index = openDocuments.indexOf(name);
+    if (index === -1) return;
+    openDocuments.splice(index, 1);
+    const neighbor = openDocuments[index] ?? openDocuments[index - 1];
+    if (documentTab === name && neighbor) {
+        switchDoc(neighbor);
+    } else {
+        if (!neighbor) {
+            documentTab = '';
+            const url = new URL(location.href);
+            url.searchParams.delete('document');
+            history.replaceState(null, '', url);
+        }
+        shell();
+    }
+    const tabs = [...document.querySelectorAll<HTMLButtonElement>('.document-tabs [data-doc]')];
+    (tabs.find(tab => tab.dataset.doc === neighbor) ?? document.querySelector<HTMLButtonElement>('#workspace [data-doc]'))?.focus();
 }
 function add(id: string) {
     const p = products.find(p => p.id === id);
@@ -387,6 +406,10 @@ app.addEventListener('click', e => {
     closeMenus();
     if (target.dataset.action)
         void action(target.dataset.action);
+    if (target.dataset.closeDoc) {
+        closeDoc(target.dataset.closeDoc);
+        return;
+    }
     if (target.dataset.doc)
         switchDoc(target.dataset.doc);
     if (target.dataset.section) {
@@ -425,6 +448,14 @@ document.addEventListener('keydown', e => {
         return;
     if (handleMenuKey(e))
         return;
+    const documentButton = e.target instanceof HTMLElement
+        ? e.target.closest<HTMLButtonElement>('.document-tabs [role="tab"][data-doc]')
+        : null;
+    if (e.key === 'Delete' && documentButton?.dataset.doc) {
+        e.preventDefault();
+        closeDoc(documentButton.dataset.doc);
+        return;
+    }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
         void action('save');
