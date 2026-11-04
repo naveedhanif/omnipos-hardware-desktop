@@ -4,7 +4,7 @@ Run this pilot against a Vercel deployment of the new Hardware frontend. Record 
 
 | Check | Expected result |
 | --- | --- |
-| Release identity | Vercel shows Ready for the commit under review. |
+| Release identity | Vercel shows Ready for the commit under review. Compare that SHA with the Frontend commit footer on the workspace. If the footer reports unavailable, record release identity as Not run until you can match the deployed URL to a commit in Vercel. |
 | Owner sign-in | An existing owner or admin signs in privately and sees the expected company and authorized Hardware stores. |
 | Read views | Manually load Products, Stock balances, Sales invoices, Goods receipts, Supplier invoices, Supplier returns and Purchase rate differences. Compare available views with existing OmniPOS. Record backend capability failures separately from empty results. |
 | Paging and search | Try Next and Previous where enough records exist. Try supported search fields. Purchase rate differences pages by invoice. |

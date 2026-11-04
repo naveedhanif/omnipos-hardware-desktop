@@ -14,6 +14,12 @@ const env = (import.meta as ImportMeta & {
     env: Record<string, string | undefined>;
 }).env;
 const inspected = inspectConnectionConfig(env, location.origin), root = document.querySelector<HTMLDivElement>('#live-workspace')!;
+const release = document.createElement('footer');
+release.className = 'connection-workspace section-footnote';
+release.textContent = env.VITE_PILOT_RELEASE
+    ? `Frontend commit: ${env.VITE_PILOT_RELEASE}`
+    : 'Frontend commit unavailable for this build.';
+root.after(release);
 let busy = false, generation = 0, view: LiveView = 'products', search = '', result: ConnectionResult | null = null, timer: ReturnType<typeof setTimeout> | undefined;
 let message = 'Sign in to browse existing records. No request is made until you approve and submit.';
 const diagnostics = inspected.config ? createWorkspaceDiagnostics({ ...createBrowserCheckPorts(inspected.config), onAuthenticated: () => { message = 'Authentication accepted. Loading your authorized company and stores…'; render('live-status'); } }) : null;
