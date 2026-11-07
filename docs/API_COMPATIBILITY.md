@@ -68,11 +68,13 @@ No additional API contracts were inferred or added.
 - Batch flags, batch references and opening-history entries are explicitly sample
   UI metadata, not verified product fields or actual stock movements.
 - Discount percentage, discount amount, gross and net are local display calculations.
-- Bills payable/receivable, cash, cheques/PDC, allocations and e-invoicing remain
-  preview layouts. Their entry and posting controls are disabled. Provider, tax,
-  settlement and accounting semantics require review before implementation.
-- The two PDC views follow the screenshot labels. Their distinct business rules
-  are unresolved and are called out in the second PDC panel.
+- The invoice tabs use the existing demo till, supplier-invoice drafts, and
+  account allocations. Batch references, delivery details, and cheque entries
+  can be stored in the scoped sample draft. PDC entry and review use the same
+  draft list.
+- The E-invoice panel checks basic draft details and opens the print preview.
+  Live cheque/PDC settlement, supplier payments, and electronic submission
+  require verified backend and provider contracts.
 - Production, transfers, adjustments, registers and settings menu entries expose
   frontend layouts only; menu presence does not establish backend capability.
 

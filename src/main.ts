@@ -2,7 +2,7 @@ import { clearTransactionDrafts, saveTransactionDraft, transactionDraftView } fr
 import './styles.css';
 import { reportWorkspace } from './ui/reportWorkspace';
 import { buildDemoReport, defaultReportQuery, type DemoReportQuery } from './services/demoReports';
-import { financeWorkspace } from './ui/financeWorkspace';
+import { accountAllocationForm, financeWorkspace } from './ui/financeWorkspace';
 import { purchaseWorkspace, purchaseLineRow } from './ui/purchaseWorkspace';
 import { createDemoSalesDocuments } from './services/demoSalesDocuments';
 import { salesDocumentsView } from './ui/salesDocuments';
@@ -17,7 +17,7 @@ import { invoiceSections, sectionTabs, sectionForShortcut, supplementaryPanel } 
 import { itemGrid } from './ui/itemGrid';
 import { appMenus, menuMarkup, workspacePages, workspacePreview } from './ui/menus';
 import { createSampleHardwareService } from './services/sampleHardwareService';
-import { createScopedDraftService } from './services/scopedDraftService';
+import { createScopedDraftService, validateDraftCheques } from './services/scopedDraftService';
 import { createSampleWorkspaceService } from './services/sampleWorkspaceService';
 import { createSampleDraft } from './workspace/sampleDraft';
 import { defaultContext, demoOrganizations, readDemoContext, rememberDemoContext, workspaceKey, workspaceDetails, type WorkspaceContext } from './workspace/context';
@@ -90,7 +90,7 @@ function extendedWorkspace(name: string) {
 }
 function invoice() { return `<div class="page-heading"><div><div class="heading-line"><h1>Sales invoice</h1><span class="draft-badge">${businessService.read().sales.some(sale => sale.reference === draft.document) ? 'Demo recorded' : 'Draft'}</span></div><p>Create an invoice, add items, and review your totals.</p></div><div class="heading-actions"><button class="button" data-business-action="record-sale">Record demo sale</button><button class="button" data-action="new">${icon('plus')} New invoice</button><button class="button icon-button" data-action="print" aria-label="Print invoice">${icon('print')}</button><button class="button primary" data-action="save">${icon('save')} Save draft <kbd>⌘ S</kbd></button></div></div><section class="document-form" aria-label="Invoice details"><div class="form-title"><h2>Invoice details</h2><span id="draft-state">${dirty ? 'Unsaved changes' : savedAt ? 'Saved locally' : 'Sample draft'}</span></div><div class="form-columns"><div>${field('Invoice no.', 'document', draft.document)}${field('Invoice date', 'date', draft.date, 'date')}<label class="field"><span>Branch</span><select disabled><option>${esc(workspaceDetails(context).store.name)}</option></select></label></div><div><label class="field"><span>Customer <span class="required">*</span></span><select name="customer">${workspaceService.getCustomers().includes(draft.customer) ? '' : `<option selected disabled>${esc(draft.customer)} (unavailable)</option>`}${workspaceService.getCustomers().map(name => `<option ${draft.customer === name ? 'selected' : ''}>${esc(name)}</option>`).join('')}</select></label>${field('LPO / reference', 'reference', draft.reference)}<label class="field"><span>Payment mode</span><select name="payment">${['Account', 'Cash', 'Card'].map(p => `<option ${draft.payment === p ? 'selected' : ''}>${p}</option>`).join('')}</select></label></div><div>${field('Salesperson', 'salesperson', 'Sample operator')}<label class="field"><span>Currency</span><select disabled><option>KWD · Kuwaiti Dinar</option></select></label>${field('Remarks', 'remarks', draft.remarks)}</div></div></section><section class="items-workspace" aria-label="Invoice line items"><div class="item-toolbar"><label class="barcode-label" for="item-search">Barcode</label><div class="search-wrap">${icon('search')}<input id="item-search" autocomplete="off" placeholder="Scan barcode or search items…" aria-label="Scan barcode or search items"><kbd>F2</kbd><div id="search-results" class="search-results" hidden></div></div><button class="button" data-action="browse">${icon('plus')} Add item</button><div class="item-count">${draft.lines.length} items <span class="status-separator">|</span> <span id="units">${totals(draft.lines).qty}</span> units</div><button class="text-button" data-action="shortcuts">${icon('grid')} Shortcuts</button></div>${sectionTabs(section, draft.lines.length)}<div id="section-panel" role="tabpanel" aria-labelledby="invoice-tab-${invoiceSections.findIndex(([name]) => name === section)}">${sectionPanel()}</div></section><section class="invoice-bottom"><div class="invoice-memo"><div>${icon('file')}<strong>Document notes</strong></div><p>${esc(draft.remarks) || 'Add delivery instructions or an internal note above.'}</p><div class="local-note">${icon('help')} This sample draft does not post a sale or change stock.</div></div><div class="totals"><div><span>Subtotal</span><strong id="subtotal">${money(totals(draft.lines).gross)}</strong></div><div><span>Item discounts</span><span id="discount">−${money(totals(draft.lines).discount)}</span></div><div><span>Additional charges</span><span id="charge">${money(draft.charge)}</span></div><div class="grand-total"><span>Total amount <small>KWD</small></span><strong id="net">${money(totals(draft.lines, draft.charge).net)}</strong></div><p>Sample prices. No tax configured.</p></div></section><div class="document-footer"><span id="save-state">${savedAt ? `Saved locally at ${savedAt}` : 'Changes stay in this browser'}</span><div><button class="text-button" data-action="restore">${icon('clock')} Restore saved draft</button><button class="text-button" data-business-action="save-quotation">Save as quotation</button><button class="text-button" data-business-action="save-sales-order">Save as order</button><button class="text-button" data-action="summary">Review summary ${icon('arrow')}</button></div></div>`; }
 function sectionPanel() {
-    const supplementary = supplementaryPanel(section, draft, workspaceService);
+    const supplementary = supplementaryPanel(section, draft, workspaceService, businessService, accountAllocationForm);
     if (supplementary)
         return supplementary;
     if (section === 'Charges & deductions')
@@ -165,17 +165,21 @@ function refreshTotals() {
             d.textContent = money(totals([l]).discount);
     });
 }
+function reportInvalidInvoiceField(): boolean {
+    const invalid = document.querySelector<HTMLInputElement>('.document-form input:invalid, #section-panel input[data-line]:invalid, #section-panel input[name="charge"]:invalid');
+    if (!invalid)
+        return false;
+    invalid.reportValidity();
+    return true;
+}
 async function action(a: string) {
     if (a.startsWith('workspace:')) {
         switchDoc(a.slice(10));
         return;
     }
     if (a === 'save') {
-        const invalid = document.querySelector<HTMLInputElement>('input:invalid');
-        if (invalid) {
-            invalid.reportValidity();
+        if (reportInvalidInvoiceField())
             return;
-        }
         try {
             draftService.save(draft);
             dirty = false;
@@ -208,7 +212,7 @@ async function action(a: string) {
     else if (a === 'new') {
         if (dirty && !confirm('Start a new sample invoice and discard unsaved changes?'))
             return;
-        draft = { ...draft, document: `SAMPLE-${Date.now().toString().slice(-6)}`, lines: [], reference: '', remarks: '', charge: 0 };
+        draft = { ...draft, document: `SAMPLE-${Date.now().toString().slice(-6)}`, lines: [], reference: '', remarks: '', charge: 0, deliveryAddress: undefined, cheques: undefined };
         dirty = true;
         switchDoc('Sales invoice');
     }
@@ -226,8 +230,23 @@ async function action(a: string) {
         switchDoc('Item catalogue');
     else if (a === 'invoice')
         switchDoc('Sales invoice');
-    else if (a === 'print')
+    else if (a === 'print') {
+        if (documentTab === 'Sales invoice' && section !== 'Items') {
+            const previous = section;
+            section = 'Items';
+            shell();
+            window.addEventListener('afterprint', () => selectSection(previous, true), { once: true });
+        }
         window.print();
+    }
+    else if (a === 'draft-cash') {
+        if (draft.payment !== 'Cash') {
+            draft.payment = 'Cash';
+            dirty = true;
+            selectSection('Cash', true);
+            notify('Cash selected for this sample draft.');
+        }
+    }
     else if (a === 'summary') {
         selectSection('Summary');
     }
@@ -272,7 +291,7 @@ function bind() {
         }
     });
     document.querySelector('#preview-search')?.addEventListener('input', e => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLTableRowElement>('.workspace-preview tbody tr').forEach(row => { row.hidden = !row.textContent?.toLowerCase().includes(q); }); });
-    document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('.document-form [name], #section-panel [name]').forEach(e => e.addEventListener('change', () => {
+    document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('.document-form [name], #section-panel [name="charge"], #section-panel [name="remarks"]').forEach(e => e.addEventListener('change', () => {
         if (e instanceof HTMLInputElement && !e.checkValidity()) {
             e.reportValidity();
             return;
@@ -425,7 +444,15 @@ app.addEventListener('click', e => {
     if (target.dataset.doc)
         switchDoc(target.dataset.doc);
     if (target.dataset.section) {
-        selectSection(target.dataset.section);
+        selectSection(target.dataset.section, true);
+        return;
+    }
+    if (target.dataset.removeCheque !== undefined && draft.cheques?.[Number(target.dataset.removeCheque)]) {
+        draft.cheques.splice(Number(target.dataset.removeCheque), 1);
+        dirty = true;
+        selectSection(section, true);
+        notify('Cheque entry removed from the sample draft.');
+        return;
     }
     if (target.dataset.add)
         add(target.dataset.add);
@@ -441,9 +468,15 @@ function selectSection(name: string, focus = false) {
     if (!invoiceSections.some(([n]) => n === name))
         return;
     section = name;
-    switchDoc('Sales invoice');
+    if (documentTab === 'Sales invoice')
+        shell();
+    else
+        switchDoc('Sales invoice');
     const tab = document.querySelector<HTMLButtonElement>(`.section-tabs [aria-selected="true"]`);
     tab?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const panel = document.querySelector('#section-panel');
+    if (panel && panel.getBoundingClientRect().top > window.innerHeight - 140)
+        document.querySelector('.section-navigation')?.scrollIntoView({ block: 'start' });
     if (focus)
         tab?.focus({ preventScroll: true });
 }
@@ -633,11 +666,8 @@ async function refreshBusiness(message: string) {
 async function handleBusinessAction(action: string, id: string) {
     try {
         if (action === 'save-quotation' || action === 'save-sales-order') {
-            const invalid = document.querySelector<HTMLInputElement>('.document-form input:invalid, #section-panel input:invalid');
-            if (invalid) {
-                invalid.reportValidity();
+            if (reportInvalidInvoiceField())
                 return;
-            }
             const kind = action === 'save-quotation' ? 'quotation' : 'order', reference = salesDocuments.save(kind, draft);
             switchDoc(kind === 'quotation' ? 'Sales quotations' : 'Sales orders');
             notify(`${reference} saved locally. No stock reserved.`);
@@ -679,11 +709,8 @@ async function handleBusinessAction(action: string, id: string) {
             return;
         }
         if (action === 'record-sale') {
-            const invalid = document.querySelector<HTMLInputElement>('.document-form input:invalid, #section-panel input:invalid');
-            if (invalid) {
-                invalid.reportValidity();
+            if (reportInvalidInvoiceField())
                 return;
-            }
             businessService.recordSale(draft);
             dirty = false;
             savedAt = '';
@@ -765,6 +792,42 @@ async function handleBusinessAction(action: string, id: string) {
         notify(error instanceof Error ? error.message : 'Local update failed.');
     }
 }
+app.addEventListener('submit', event => {
+    const form = event.target as HTMLFormElement;
+    const kind = form.dataset.invoiceForm;
+    if (!kind)
+        return;
+    event.preventDefault();
+    if (demoSession !== 'active' || documentTab !== 'Sales invoice' || !form.reportValidity())
+        return;
+    const data = new FormData(form);
+    const value = (name: string) => String(data.get(name) ?? '').trim();
+    try {
+        if (kind === 'batch') {
+            draft.lines.forEach((line, index) => {
+                const name = `batch-${index}`;
+                if (data.has(name) && workspaceService.getItemPresentation(line.product.id).hasBatch)
+                    line.batch = value(name);
+            });
+        } else if (kind === 'info') {
+            draft.reference = value('customerReference');
+            draft.deliveryAddress = value('deliveryAddress');
+        } else if (kind === 'cheque') {
+            const postDated = form.dataset.postDated === 'true';
+            const date = value('chequeDate');
+            if (postDated && draft.date && date < draft.date)
+                throw new Error('Maturity date cannot be before the invoice date.');
+            const entries = [...(draft.cheques ?? []), { number: value('number'), bank: value('bank'), date, amount: Number(value('amount')), postDated }];
+            validateDraftCheques(entries);
+            draft.cheques = entries;
+        }
+        dirty = true;
+        selectSection(section, true);
+        notify('Updated the sample invoice. Use Save draft to keep your changes.');
+    } catch (error) {
+        notify(error instanceof Error ? error.message : 'Unable to update the sample invoice.');
+    }
+});
 app.addEventListener('submit', event => {
     const form = event.target as HTMLFormElement;
     if (!form.dataset.businessForm)

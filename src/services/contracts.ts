@@ -15,8 +15,17 @@ export interface HardwareCatalogService {
   getHardwareProducts(storeId: string, params?: ProductQuery, options?: { signal?: AbortSignal }): Promise<ProductPage>;
 }
 // Prototype-only view state, NOT an OmniPOS invoice-create request.
-export interface DraftLine { product: HardwareProduct; qty: number; price: number; discount: number }
+export interface DraftLine { product: HardwareProduct; qty: number; price: number; discount: number; batch?: string }
+export interface DraftCheque {
+  number: string;
+  bank: string;
+  date: string;
+  amount: number;
+  postDated: boolean;
+}
 export interface InvoiceDraft {
   version: 1; document: string; date: string; customer: string; reference: string;
   payment: string; remarks: string; lines: DraftLine[]; charge: number;
+  deliveryAddress?: string;
+  cheques?: DraftCheque[];
 }

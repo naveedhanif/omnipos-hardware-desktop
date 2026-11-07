@@ -54,6 +54,21 @@ test('copied or corrupt scoped envelopes fail closed; unscoped legacy draft is i
   storage.setItem(draftStorageKey(a), '{invalid'); assert.throws(() => sa.load());
 });
 
+test('invoice tab entries survive scoped draft save and reject duplicate or invalid cheques', () => {
+  const storage = memoryStorage(), service = createScopedDraftService(a, storage);
+  const draft = createSampleDraft(a);
+  draft.deliveryAddress = 'Sample receiving bay';
+  draft.lines[2].batch = 'BATCH-014';
+  const cheque = { number: 'CH-17', bank: 'Sample Bank', date: '2026-11-30', amount: 21.125, postDated: true };
+  draft.cheques = [cheque];
+  service.save(draft);
+  assert.deepEqual(service.load(), draft);
+  assert.equal(createScopedDraftService(branch, storage).load(), null);
+  assert.throws(() => service.save({ ...draft, cheques: [cheque, { ...cheque, bank: ' sample bank ' }] }), /already/);
+  assert.throws(() => service.save({ ...draft, cheques: [{ ...cheque, amount: 0.0001 }] }), /valid cheque/);
+  assert.deepEqual(service.load()?.cheques, [cheque]);
+});
+
 test('invalid line values and forged product identifiers are refused', () => {
   const service = createScopedDraftService(a, memoryStorage());
   for (const patch of [{ qty: 0 }, { qty: NaN }, { qty: 1.25 }, { price: -1 }, { discount: 101 }]) {
