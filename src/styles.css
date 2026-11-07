@@ -12,13 +12,13 @@
 .document-tabs{overflow-x:auto;min-width:0;scrollbar-width:thin}
 .document-tabs button{flex-shrink:0;white-space:nowrap}
 .document-bar{gap:16px}.offline{white-space:nowrap}
-.section-navigation{display:flex;align-items:stretch;border-bottom:1px solid var(--line);position:relative;min-width:0}
-.section-tabs{border:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:0;height:49px;flex:1;min-width:0;overscroll-behavior-x:contain}
-.section-tabs button{flex-shrink:0;white-space:nowrap;padding:0 12px;gap:8px;height:44px;font-size:11px;border-bottom:2px solid var(--clear)}
-.section-tabs button+button::before{content:'';height:15px;border-left:1px solid var(--line);position:absolute;left:0}
-.section-tabs button[aria-selected=true]{background:var(--accent-soft);border-bottom:2px solid var(--accent)}
-.section-tabs button:hover{background:var(--soft)}.section-tabs kbd{font-size:10px}
-.tab-scroll{width:28px;flex-shrink:0;color:var(--muted);font-size:23px;border-radius:0;background:var(--soft)}
+.section-navigation{display:flex;align-items:center;gap:6px;padding:0 6px;background:var(--canvas);border:1px solid var(--line);border-radius:10px;min-width:0}
+.section-tabs{border:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:6px;height:auto;padding:5px 4px;flex:1;min-width:0;overscroll-behavior-x:contain;scroll-padding-inline:4px}
+.section-tabs button{flex-shrink:0;white-space:nowrap;padding:0 12px;gap:8px;height:34px;font-size:11px;background:var(--soft);border:1px solid var(--line);border-top:2px solid var(--line);border-radius:8px}
+.section-tabs button:hover{background:var(--accent-soft)}
+.section-tabs button[aria-selected=true]{background:var(--paper);border-top-color:var(--accent);border-bottom:1px solid var(--line)}
+.section-tabs kbd{font-size:10px}
+.tab-scroll{width:28px;height:34px;padding:0;flex-shrink:0;color:var(--muted);font-size:20px;border-radius:7px;background:var(--soft);border:1px solid var(--line)}
 .tab-scroll:hover{color:var(--accent);background:var(--accent-soft)}
 .grid-scroll-label{display:flex;align-items:center;justify-content:flex-end;gap:8px;color:var(--muted);font-size:10px;padding:8px 0}
 .grid-scroll-label span{font-size:15px;line-height:1}
