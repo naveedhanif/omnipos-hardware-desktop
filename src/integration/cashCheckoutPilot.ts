@@ -15,6 +15,16 @@ export type CashCheckoutOutcome =
     | { status: 'denied' }
     | { status: 'uncertain'; reference: string };
 
+export function cashPilotUnitPrice(store: BackendStore, product: ReadProduct): number | null {
+    const price = product.sell_price;
+    if (store.business_type !== 'hardware' || store.currency !== 'KWD' || product.store_id !== store.id || !uuid(product.id) ||
+        price === null || price <= 0 || !/^\d+(?:\.\d{1,3})?$/.test(String(price)) ||
+        !Number.isSafeInteger(Math.round(price * 1000)) ||
+        product.stock_qty === null || !Number.isFinite(product.stock_qty) || product.stock_qty < 1)
+        return null;
+    return price;
+}
+
 /** Prepare the exact-cash, one-item pilot request from a scoped product and till. */
 export function prepareCashCheckout(
     store: BackendStore,
@@ -23,14 +33,11 @@ export function prepareCashCheckout(
     till: { id: string; store_id: string; status: string },
     reference: string,
 ): CashCheckoutRequest {
-    const price = product.sell_price;
-    if (!uuid(pilotStoreId) || store.id !== pilotStoreId || store.business_type !== 'hardware' ||
-        store.currency !== 'KWD' || product.store_id !== store.id || !uuid(product.id) ||
+    if (!uuid(pilotStoreId) || store.id !== pilotStoreId ||
         !uuid(till.id) || till.store_id !== store.id || till.status !== 'open' || !uuid(reference))
         throw new Error('Cash checkout requires the approved Hardware store, its product and its open till.');
-    if (price === null || price <= 0 || !/^\d+(?:\.\d{1,3})?$/.test(String(price)) ||
-        !Number.isSafeInteger(Math.round(price * 1000)) ||
-        product.stock_qty === null || !Number.isFinite(product.stock_qty) || product.stock_qty < 1)
+    const price = cashPilotUnitPrice(store, product);
+    if (price === null)
         throw new Error('Cash checkout requires a valid KWD price and one available unit.');
     const line = Object.freeze({ productId: product.id, qty: 1 as const, price, name: product.name });
     return Object.freeze({

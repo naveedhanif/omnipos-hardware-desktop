@@ -1,4 +1,4 @@
-import { liveCashSaleReview, bindLiveCashSaleReview } from './ui/liveCashSaleReview';
+import { liveCashSaleReview, type CashSaleReview } from './ui/liveCashSaleReview';
 import { createWorkspaceDiagnostics } from './integration/workspaceDiagnostics';
 import { workspaceDiagnosticPanel } from './ui/workspaceDiagnostics';
 import { liveViewLabels as views, liveViewTabs, bindLiveViewTabs, focusLiveControl, liveSessionNotice } from './ui/liveViewTabs';
@@ -21,6 +21,7 @@ release.textContent = env.VITE_PILOT_RELEASE
     : 'Frontend commit unavailable for this build.';
 root.after(release);
 let busy = false, generation = 0, view: LiveView = 'products', search = '', result: ConnectionResult | null = null, timer: ReturnType<typeof setTimeout> | undefined;
+let cashReview: CashSaleReview = { productId: '', till: null };
 let message = 'Sign in to browse existing records. No request is made until you approve and submit.';
 const diagnostics = inspected.config ? createWorkspaceDiagnostics({ ...createBrowserCheckPorts(inspected.config), onAuthenticated: () => { message = 'Authentication accepted. Loading your authorized company and stores…'; render('live-status'); } }) : null;
 const workspace = diagnostics ? createReadOnlyWorkspace(diagnostics.ports) : null;
@@ -29,6 +30,8 @@ function render(focus?: string) {
     const state = workspace?.summary() ?? null;
     if (!state && result)
         result = null;
+    if (result?.kind !== 'products')
+        cashReview = { productId: '', till: null };
     clearTimeout(timer);
     if (state)
         timer = setTimeout(() => clear(true), Math.max(0, state.expiresAt - Date.now()));
@@ -36,31 +39,31 @@ function render(focus?: string) {
     root.innerHTML = `<header class="app-header"><a class="brand" href="/workspace.html"><strong>omnipos</strong><span class="brand-divider"></span><span class="hardware-label">Hardware</span></a><span class="sample-label">Live · read only</span>${state ? `<span class="live-company">${esc(state.company)}</span><button class="button" data-live-end>Sign out</button>` : ''}</header><main class="connection-workspace" id="live-main"><a class="skip" href="#live-status">Skip to workspace status</a><div class="page-heading"><div><h1>${state ? 'Hardware records' : 'Open your Hardware workspace'}</h1><p>Existing OmniPOS records. Business writes are disabled.</p></div><a class="button" href="/">Open sample invoice workspace</a></div><p role="status" aria-live="polite" aria-atomic="true" tabindex="-1" id="live-status" class="connection-status">${esc(message)}</p>${workspaceDiagnosticPanel(diagnostics?.snapshot() ?? null)}${inspected.missing.length ? `<section class="access-panel"><h2>Configuration needs attention</h2><ul>${inspected.missing.map(m => `<li>${esc(m)}</li>`).join('')}</ul></section>` : ''}${!state ? `<section><p>This workspace reads your existing categories, products, suppliers, purchase orders, stock balances, sales invoices, goods receipts, supplier invoices and supplier returns allowed for your account. Your session stays in memory for up to 15 minutes; reloading signs you out. No account, database or transaction changes are included.</p><form class="operation-form" id="live-sign-in"><div class="settlement-inputs"><label>Account email<input id="live-email" name="email" type="email" required autocomplete="username" maxlength="254" ${busy || !workspace ? 'disabled' : ''}></label><label>Password<input name="password" type="password" required autocomplete="current-password" maxlength="1024" ${busy || !workspace ? 'disabled' : ''}></label></div><label class="connection-consent"><input type="checkbox" name="consent" required ${busy || !workspace ? 'disabled' : ''}><span>I approve sign-in to ${esc(inspected.config?.authOrigin ?? 'the configured auth project')} and manual read-only browsing through ${esc(inspected.config?.apiOrigin ?? 'the configured backend')}. Each read rechecks my company, store and access. No business records will be changed.</span></label><button class="button primary" ${busy || !workspace ? 'disabled' : ''}>${busy ? 'Signing in…' : 'Sign in to read-only workspace'}</button></form><a href="/connection.html">Open the one-read diagnostic check</a></section>` : `<section>${liveSessionNotice(state.expiresAt)}<div class="settlement-inputs"><label>Company<input readonly value="${esc(state.company)}"></label><label>Hardware store<select id="live-store" ${busy ? 'disabled' : ''}><option value="">Select a store</option>${state.stores.map(s => `<option value="${esc(s.id)}" ${s.id === state.storeId ? 'selected' : ''}>${esc(s.name)} (${esc(s.currency)})</option>`).join('')}</select></label></div>${liveViewTabs(view, state, busy)}<section role="tabpanel" id="live-view-panel" aria-labelledby="live-tab-${view}" aria-busy="${busy}" tabindex="0"><form id="live-search" class="report-filters">${view !== 'rateDifferences' ? `<label>Search ${esc(views[view].toLowerCase())}<input name="search" maxlength="120" value="${esc(search)}" placeholder="${view === 'supplierReturns' ? 'Return reference' : view === 'supplierInvoices' ? 'Supplier or internal invoice reference' : view === 'receipts' ? 'GRN or delivery reference' : 'Name, code or reference'}" ${busy ? 'disabled' : ''}></label>` : '<p>This report supports invoice paging only.</p>'}<button id="live-load" class="button primary" ${busy || !store ? 'disabled' : ''}>${busy ? 'Checking access and reading…' : 'Load records'}</button>${view !== 'rateDifferences' ? `<button type="button" class="button" data-live-reset ${busy ? 'disabled' : ''}>Clear search</button>` : ''}</form><p class="section-footnote">${store ? `Selected store: ${esc(store.name)}. ` : 'Select a store first. '}Reads are manual, ${view === 'rateDifferences' ? '10 qualifying invoices per page; each invoice may produce multiple or no variance lines' : '10 records per page'}. Switching stores or views clears the displayed records.</p>${result ? `<div id="live-results" role="region" aria-label="${esc(views[view])} results" tabindex="-1">${connectionResults(result, state.company, store, true)}</div><button type="button" class="button" data-live-clear ${busy ? 'disabled' : ''}>Clear displayed records</button>` : '<div class="empty-state">Choose a store and view, then load records. No sample records are substituted.</div>'}${result && result.data.totalPages !== null ? `<div class="report-pagination"><span>${view === 'rateDifferences' ? 'Invoice page' : `Applied search: ${esc(search || 'All records')} · page`} ${result.data.page}</span><div><button class="button" data-live-page="${result.data.page - 1}" ${busy || result.data.page <= 1 ? 'disabled' : ''}>Previous</button><button class="button" data-live-page="${result.data.page + 1}" ${busy || result.data.page >= result.data.totalPages || result.data.page >= 10000 ? 'disabled' : ''}>Next</button></div></div>` : ''}<p class="section-footnote">No export, editing, stock adjustment, checkout or refund is enabled here. Complete reporting, server tenant isolation and write authority still require separate verification.</p></section></section>`}</main>`;
     if (store && result?.kind === 'products') {
         const results = root.querySelector('#live-results');
-        results?.insertAdjacentHTML('beforeend', liveCashSaleReview(store, result.data.products, busy));
-        if (results) bindLiveCashSaleReview(results, store, result.data.products);
+        results?.insertAdjacentHTML('beforeend', liveCashSaleReview(store, result.data.products, cashReview, busy));
+        results?.querySelector<HTMLSelectElement>('#live-sale-product')?.addEventListener('change', event => {
+            cashReview = { productId: (event.currentTarget as HTMLSelectElement).value, till: null };
+            render('live-sale-product');
+        });
     }
     root.querySelector('#live-check-till')?.addEventListener('click', async () => {
-        if (!workspace || busy) return;
-        const selectedProduct = root.querySelector<HTMLSelectElement>('#live-sale-product')?.value;
+        if (!workspace || busy || !cashReview.productId) return;
         const attempt = ++generation;
         busy = true;
+        cashReview.till = null;
         message = 'Checking the selected store’s till…';
         render('live-status');
         try {
             const open = await workspace.checkActiveTill();
-            if (attempt === generation)
+            if (attempt === generation) {
+                cashReview.till = open ? 'open' : 'closed';
                 message = open ? 'The selected store has an open till.' : 'The selected store has no open till.';
+            }
         } catch (error) {
             if (attempt === generation) message = connectionError(error);
         } finally {
             if (attempt === generation) {
                 busy = false;
-                render('live-status');
-                const product = root.querySelector<HTMLSelectElement>('#live-sale-product');
-                if (product && selectedProduct) {
-                    product.value = selectedProduct;
-                    product.dispatchEvent(new Event('change'));
-                }
+                render(workspace.summary() ? 'live-check-till' : 'live-status');
             }
         }
     });

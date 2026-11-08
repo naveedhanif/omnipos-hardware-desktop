@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { prepareCashCheckout, cashCheckoutAttempt } from '../src/integration/cashCheckoutPilot.ts';
+import { liveCashSaleReview } from '../src/ui/liveCashSaleReview.ts';
 const storeId = '11111111-1111-4111-8111-111111111111';
 const productId = '22222222-2222-4222-8222-222222222222';
 const tillId = '33333333-3333-4333-8333-333333333333';
@@ -16,6 +17,18 @@ test('checkout binds the request to the designated store, till and exact cash', 
     assert.throws(() => prepareCashCheckout(store, storeId, { ...product, store_id: tillId }, till, reference));
     assert.throws(() => prepareCashCheckout(store, storeId, product, { ...till, status: 'closed' }, reference));
     assert.throws(() => prepareCashCheckout(store, storeId, { ...product, sell_price: 1.1234 }, till, reference));
+});
+
+test('cash review only offers eligible items and displays three-decimal KWD after selection', () => {
+    const items = [{ ...product, sell_price: 1.1 }, { ...product, id: reference, name: 'Fractional fils', sell_price: 1.1234 }];
+    const unselected = liveCashSaleReview(store, items, { productId: '', till: null }, false);
+    assert.match(unselected, /id="live-check-till" disabled/);
+    assert.doesNotMatch(unselected, /Fractional fils/);
+    const selected = liveCashSaleReview(store, items, { productId, till: 'open' }, false);
+    assert.match(selected, /KWD 1\.100/);
+    assert.match(selected, /Open when last checked/);
+    assert.doesNotMatch(selected, /id="live-check-till" disabled/);
+    assert.equal(liveCashSaleReview({ ...store, currency: 'USD' }, items, { productId, till: null }, false), '');
 });
 
 test('an uncertain checkout is submitted only once, including concurrent clicks', async () => {
