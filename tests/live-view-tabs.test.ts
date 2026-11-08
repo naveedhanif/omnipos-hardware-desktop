@@ -17,7 +17,8 @@ test('tab markup has one keyboard entry, named tabs and valid selected panel rel
 });
 test('keyboard wraps, handles Home/End, skips restricted views and leaves unrelated keys alone', () => {
     const accessible = enabledLiveViews(staff);
-    assert.deepEqual(accessible, ['products', 'inventory']);
+    assert.deepEqual(accessible, ['products', 'categories', 'inventory']);
+    assert.equal(nextLiveView('products', 'ArrowRight', accessible), 'categories');
     assert.equal(nextLiveView('products', 'ArrowLeft', accessible), 'inventory');
     assert.equal(nextLiveView('inventory', 'ArrowRight', accessible), 'products');
     assert.equal(nextLiveView('inventory', 'Home', accessible), 'products');

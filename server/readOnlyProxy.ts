@@ -1,5 +1,7 @@
-import { uuid } from '../src/integration/decoders.ts';
+import { decodeStartup, record, resolveHardwareScope, uuid } from '../src/integration/decoders.ts';
+import type { HardwareReadScope } from '../src/integration/contracts.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { directoryForPath, projectHardwareDirectory } from '../src/integration/hardwareDirectories.ts';
 import { hardwareTargets } from '../src/integration/connectionConfig.ts';
 import { allowedReadPath, limitedText } from '../src/integration/readBoundary.ts';
 export interface ProxyInput {
@@ -25,16 +27,43 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
         return fail(405, 'READ_ONLY_METHOD');
     if (!allowedReadPath(input.path))
         return fail(404, 'READ_PATH_NOT_ALLOWED');
-    if (!input.authorization || !/^Bearer [A-Za-z0-9._~-]{1,8192}$/.test(input.authorization))
+    const { authorization } = input;
+    if (!authorization || !/^Bearer [A-Za-z0-9._~-]{1,8192}$/.test(authorization))
         return fail(401, 'SESSION_REQUIRED');
     if (input.apiOrigin?.replace(/\/$/, '') !== hardwareTargets.apiOrigin)
         return fail(503, 'PROXY_TARGET_NOT_CONFIGURED');
     try {
-        const response = await fetcher(hardwareTargets.apiOrigin + input.path, {
-            method: 'GET', headers: { Authorization: input.authorization, Accept: 'application/json' },
-            redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(upstreamReadTimeoutMs),
+        const route = new URL(input.path, hardwareTargets.apiOrigin);
+        const directory = directoryForPath(route.pathname);
+        const signal = AbortSignal.timeout(upstreamReadTimeoutMs);
+        const upstream = (path: string) => fetcher(hardwareTargets.apiOrigin + path, {
+            method: 'GET', headers: { Authorization: authorization, Accept: 'application/json' },
+            redirect: 'error', cache: 'no-store', signal,
         });
-        const reviewedCodes = capabilityCodes[new URL(input.path, hardwareTargets.apiOrigin).pathname];
+        let upstreamPath = input.path, directoryScope: HardwareReadScope | undefined;
+        if (directory) {
+            const startup = await upstream('/api/startup-context');
+            if (!startup.ok)
+                return fail([401, 403].includes(startup.status) ? startup.status : 502, 'UPSTREAM_READ_REFUSED');
+            if (!startup.headers.get('content-type')?.toLowerCase().includes('application/json'))
+                return fail(502, 'UPSTREAM_INVALID_RESPONSE');
+            const payload = record(JSON.parse(await limitedText(startup)));
+            const userId = record(payload.user).id, storeId = route.searchParams.get('storeId')!;
+            if (!uuid(userId))
+                return fail(502, 'UPSTREAM_INVALID_RESPONSE');
+            const context = decodeStartup(payload, userId);
+            try {
+                directoryScope = resolveHardwareScope(context, storeId, 0);
+            }
+            catch {
+                return fail(403, 'UPSTREAM_READ_REFUSED');
+            }
+            if (directory !== 'categories' && !['owner', 'admin'].includes(context.profile!.role.toLowerCase()))
+                return fail(403, 'UPSTREAM_READ_REFUSED');
+            upstreamPath = `${route.pathname}?${new URLSearchParams({ storeId })}`;
+        }
+        const response = await upstream(upstreamPath);
+        const reviewedCodes = capabilityCodes[route.pathname];
         if (!response.ok && response.status === 503 && reviewedCodes && response.headers.get('content-type')?.toLowerCase().includes('application/json')) {
             // Preserve only route-specific reviewed capability diagnostics, never upstream exception text.
             const body = JSON.parse(await limitedText(response, 16384));
@@ -49,7 +78,10 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             return fail(502, 'UPSTREAM_INVALID_RESPONSE');
         const body = await limitedText(response);
         const payload = JSON.parse(body);
-        const route = new URL(input.path, hardwareTargets.apiOrigin);
+        if (directory && directoryScope) {
+            const page = projectHardwareDirectory(directory, payload, directoryScope, Number(route.searchParams.get('page')), route.searchParams.get('search') ?? '');
+            return { status: 200, body: JSON.stringify(page) };
+        }
         if (route.pathname === '/api/hardware/till/active') {
             if (payload?.demoFallback !== false)
                 return fail(502, 'UPSTREAM_INVALID_RESPONSE');

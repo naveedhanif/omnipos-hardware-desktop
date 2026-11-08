@@ -4,7 +4,7 @@ import { HardwareReadError, type ReadErrorKind } from './contracts.ts';
 import { AuthCheckError, type AuthCheckCode } from './authCheckError.ts';
 import { projectHttpStatus, projectReadCode, projectReadReference } from './safeReadDiagnostics.ts';
 export const diagnosticOperations = {
-    signIn: 'Sign-in and workspace verification', products: 'Products', inventory: 'Stock balances',
+    signIn: 'Sign-in and workspace verification', products: 'Products', categories: 'Categories', suppliers: 'Suppliers', purchaseOrders: 'Purchase orders', inventory: 'Stock balances',
     invoices: 'Sales invoices', receipts: 'Goods receipts', supplierInvoices: 'Supplier invoices',
     supplierReturns: 'Supplier returns', rateDifferences: 'Purchase rate differences',
 } as const;

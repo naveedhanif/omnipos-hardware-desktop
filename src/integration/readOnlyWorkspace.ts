@@ -3,6 +3,7 @@ import { resolveHardwareScope, uuid } from './decoders.ts';
 import { HardwareReadError, type ReadIdentity, type StartupContext, type BackendStore } from './contracts.ts';
 import type { CheckPorts, CheckSession } from './connectionCheck.ts';
 import { readWindow, type ReadWindow } from './readWindow.ts';
+import { directoryRoutes, type HardwareDirectory } from './hardwareDirectories.ts';
 import type { ReadResult } from './readResult.ts';
 export type LiveView = ReadResult['kind'];
 export const workspaceLifetimeMs = 15 * 60000;
@@ -133,16 +134,18 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
                 throw new Error('Wait for the current read to finish.');
             if (!startup?.organization || !identity?.storeId)
                 throw new Error('Select an authorized Hardware store first.');
-            if (!['products', 'inventory', 'invoices', 'receipts', 'supplierInvoices', 'supplierReturns', 'rateDifferences'].includes(view))
+            if (!['products', 'inventory', 'invoices', 'receipts', 'supplierInvoices', 'supplierReturns', 'rateDifferences', ...Object.keys(directoryRoutes)].includes(view))
                 throw new Error('Choose a supported read-only view.');
             const q = readWindow(window);
             if (view === 'rateDifferences' && q.search)
                 throw new HardwareReadError('not-ready', 'Rate differences support invoice pages only.');
             return readScoped(async (storeId, fresh, signal) => {
-                if (['invoices', 'receipts', 'supplierInvoices', 'supplierReturns', 'rateDifferences'].includes(view) && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
+                if (['invoices', 'receipts', 'supplierInvoices', 'supplierReturns', 'rateDifferences', 'suppliers', 'purchaseOrders'].includes(view) && !['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
                     throw new HardwareReadError('forbidden', 'Owner/admin access is required for this view.');
                 let result: ReadResult;
-                if (view === 'products')
+                if (view === 'categories' || view === 'suppliers' || view === 'purchaseOrders')
+                    result = { kind: view, data: await adapter.getHardwareDirectory(view, storeId, { ...q, signal }) } as Extract<ReadResult, { kind: HardwareDirectory }>;
+                else if (view === 'products')
                     result = { kind: 'products', data: await adapter.getHardwareProducts(storeId, { page: q.page, limit: 10, search: q.search }, { signal: signal }) };
                 else if (view === 'invoices')
                     result = { kind: 'invoices', data: await adapter.getHardwareInvoices(storeId, { ...q, signal: signal }) };

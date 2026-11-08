@@ -69,7 +69,7 @@ test('manual receipt reads revalidate access and request only the bounded verifi
     for (const query of ['limit=100', 'limit=10&poId=' + id, 'limit=10&search=x%2Cy', 'limit=10&page=1'])
         assert.equal(allowedReadPath(`/api/hardware/goods-receipts?storeId=${store}&page=1&${query}`), false);
     assert.equal(allowedReadPath(`/api/hardware/goods-receipts/${id}?storeId=${store}&page=1&limit=10`), false);
-    assert.equal(allowedReadPath(`/api/hardware/purchase-orders?storeId=${store}&page=1&limit=10`), false);
+    assert.equal(allowedReadPath(`/api/hardware/purchase-orders/${id}?storeId=${store}&page=1&limit=10`), false);
 });
 test('revoked purchasing role stops before receipt fetch and clears the session', async () => {
     let role = 'OWNER';

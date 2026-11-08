@@ -1,3 +1,4 @@
+import type { DirectoryPage, HardwareDirectory } from './hardwareDirectories.ts';
 import type { RateDifferencePage } from './rateDifferenceRead.ts';
 import type { SupplierReturnPage } from './supplierReturnRead.ts';
 import type { SupplierInvoicePage } from './supplierInvoiceRead.ts';
@@ -5,7 +6,7 @@ import type { ReceiptPage } from './receiptRead.ts';
 import type { ReadProductPage } from './contracts.ts';
 import type { InventoryPage } from './inventoryRead.ts';
 import type { InvoicePage } from './invoiceRead.ts';
-export type ReadResult = {
+export type ReadResult = { [Kind in HardwareDirectory]: { kind: Kind; data: DirectoryPage } }[HardwareDirectory] | {
     kind: 'products';
     data: ReadProductPage;
 } | {

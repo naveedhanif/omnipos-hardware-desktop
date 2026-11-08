@@ -1,13 +1,13 @@
 import type { LiveView, WorkspaceSummary } from '../integration/readOnlyWorkspace.ts';
 import { escapeHtml as esc } from './html.ts';
 export const liveViewLabels: Record<LiveView, string> = {
-    products: 'Products', inventory: 'Stock balances', invoices: 'Invoice register',
+    products: 'Products', categories: 'Categories', suppliers: 'Suppliers', purchaseOrders: 'Purchase orders', inventory: 'Stock balances', invoices: 'Invoice register',
     receipts: 'Goods receipts', supplierInvoices: 'Supplier invoices',
     supplierReturns: 'Supplier returns', rateDifferences: 'Purchase rate differences',
 };
 type Access = Pick<WorkspaceSummary, 'canReadInvoices' | 'canReadPurchasing'>;
 export function enabledLiveViews(access: Access): LiveView[] {
-    return (Object.keys(liveViewLabels) as LiveView[]).filter(key => key === 'products' || key === 'inventory' || (key === 'invoices' ? access.canReadInvoices : access.canReadPurchasing));
+    return (Object.keys(liveViewLabels) as LiveView[]).filter(key => key === 'products' || key === 'categories' || key === 'inventory' || (key === 'invoices' ? access.canReadInvoices : access.canReadPurchasing));
 }
 export function nextLiveView(current: LiveView, key: string, enabled: readonly LiveView[]): LiveView | null {
     if (!enabled.length || !enabled.includes(current))
@@ -28,7 +28,7 @@ export function liveViewTabs(current: LiveView, access: Access, busy = false): s
     return `<p id="live-tab-help" class="section-footnote">Use Left/Right arrows, Home or End to choose a view. Selecting a view does not load records.</p><div class="live-read-tabs" role="tablist" aria-label="Read-only views" aria-describedby="live-tab-help">${(Object.entries(liveViewLabels) as [
         LiveView,
         string
-    ][]).map(([key, label]) => `<button type="button" role="tab" id="live-tab-${key}" aria-controls="live-view-panel" aria-selected="${key === current}" tabindex="${key === current && !busy && enabled.includes(key) ? 0 : -1}" data-live-view="${key}" ${busy || !enabled.includes(key) ? 'disabled' : ''}>${esc(label)}${key !== 'products' && key !== 'inventory' ? ' · owner/admin' : ''}</button>`).join('')}</div>`;
+    ][]).map(([key, label]) => `<button type="button" role="tab" id="live-tab-${key}" aria-controls="live-view-panel" aria-selected="${key === current}" tabindex="${key === current && !busy && enabled.includes(key) ? 0 : -1}" data-live-view="${key}" ${busy || !enabled.includes(key) ? 'disabled' : ''}>${esc(label)}${key !== 'products' && key !== 'categories' && key !== 'inventory' ? ' · owner/admin' : ''}</button>`).join('')}</div>`;
 }
 /** DOM binding has no service or transport: changing view can only notify the page. */
 export function bindLiveViewTabs(root: ParentNode, select: (view: LiveView) => void) {

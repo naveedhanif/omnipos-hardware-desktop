@@ -1,3 +1,4 @@
+import { decodeDirectoryPage, directoryRoutes, type HardwareDirectory } from './hardwareDirectories.ts';
 import { projectReadCode, projectReadReference } from './safeReadDiagnostics.ts';
 import { decodeRateDifferencePage } from './rateDifferenceRead.ts';
 import { decodeSupplierReturnPage } from './supplierReturnRead.ts';
@@ -136,6 +137,14 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
             const identity = capture();
             scoped(identity, storeId);
             return decodeReceivingCapabilities(await read(`/api/hardware/capabilities?${new URLSearchParams({ storeId })}`, identity, options?.signal));
+        },
+        async getHardwareDirectory(kind: HardwareDirectory, storeId: string, options?: ReadWindow & { signal?: AbortSignal }) {
+            const identity = capture();
+            scoped(identity, storeId);
+            const q = readWindow(options), query = new URLSearchParams({ storeId, page: String(q.page), limit: '10' });
+            if (q.search)
+                query.set('search', q.search);
+            return decodeDirectoryPage(await read(`${directoryRoutes[kind]}?${query}`, identity, options?.signal), q.page);
         },
         async getHardwareInventoryBalances(storeId: string, options?: ReadWindow & {
             signal?: AbortSignal;
