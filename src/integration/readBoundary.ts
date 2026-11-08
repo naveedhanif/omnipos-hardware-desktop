@@ -1,4 +1,5 @@
 import { uuid } from './decoders.ts';
+import { directoryForPath } from './hardwareDirectories.ts';
 import { readWindow } from './readWindow.ts';
 /** Exact API allow-list shared by browser and server; no generic /api forwarding. */
 export function allowedReadPath(path: string): boolean {
@@ -11,7 +12,7 @@ export function allowedReadPath(path: string): boolean {
         return [...url.searchParams.keys()].length === 1 && uuid(url.searchParams.get('storeId'));
     if (url.pathname === '/api/startup-context')
         return !url.search;
-    if (!['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices', '/api/hardware/goods-receipts', '/api/hardware/supplier-invoices', '/api/hardware/supplier-returns', '/api/hardware/supplier-invoices/reports/rate-differences'].includes(url.pathname))
+    if (!directoryForPath(url.pathname) && !['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices', '/api/hardware/goods-receipts', '/api/hardware/supplier-invoices', '/api/hardware/supplier-returns', '/api/hardware/supplier-invoices/reports/rate-differences'].includes(url.pathname))
         return false;
     if (url.pathname === '/api/hardware/supplier-invoices/reports/rate-differences' && url.searchParams.has('search'))
         return false;

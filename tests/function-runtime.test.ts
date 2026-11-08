@@ -38,6 +38,9 @@ test('unbundled emitted API entries start in plain Node and refuse unauthenticat
         const paths = [
             '/api/startup-context',
             '/api/hardware/products',
+            '/api/hardware/categories',
+            '/api/hardware/suppliers',
+            '/api/hardware/purchase-orders',
             '/api/hardware/inventory/balances',
             '/api/hardware/sales/invoices',
             '/api/hardware/goods-receipts',

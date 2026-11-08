@@ -56,6 +56,8 @@ export interface DemoOrder {
     reference: string;
     supplier: string;
     date: string;
+    expectedDeliveryDate?: string;
+    notes?: string;
     lines: (DemoLine & {
         receivedQty?: number;
     })[];
@@ -106,6 +108,21 @@ const text = (value: string, max = 120) => {
         throw new Error(`Enter 1 to ${max} characters.`);
     return v;
 };
+function calendarDate(value: unknown): value is string {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value))
+        return false;
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+function draftOrderDetails(input: Pick<DemoOrder, 'expectedDeliveryDate' | 'notes'>) {
+    const expectedDeliveryDate = input.expectedDeliveryDate?.trim() || undefined;
+    const notes = input.notes?.trim() || undefined;
+    if (expectedDeliveryDate && !calendarDate(expectedDeliveryDate))
+        throw new Error('Enter a valid expected delivery date.');
+    if (notes && notes.length > 1000)
+        throw new Error('Use at most 1000 characters for purchase order notes.');
+    return { expectedDeliveryDate, notes };
+}
 const amount = (value: number) => {
     if (!Number.isFinite(value) || value < 0 || value > 100000 || Math.abs(value * 1000 - Math.round(value * 1000)) > 1e-6)
         throw new Error('Use a non-negative amount with up to 3 decimal places.');
@@ -166,6 +183,9 @@ function validateStoredBusiness(value: DemoBusinessState) {
     unique(value.orders, o => o.reference);
     for (const order of value.orders) {
         if (!id(order.id) || !label(order.reference, 100) || !label(order.supplier, 120) || !date(order.date) || !['draft', 'partial', 'received'].includes(order.status) || (order.invoiceReference !== null && !label(order.invoiceReference, 100)))
+            fail();
+        if (order.notes !== undefined && (typeof order.notes !== 'string' || order.notes.length > 1000) ||
+            order.expectedDeliveryDate !== undefined && !calendarDate(order.expectedDeliveryDate))
             fail();
         lines(order.lines);
         if (order.lines.some(l => l.receivedQty !== undefined && (!Number.isFinite(l.receivedQty) || l.receivedQty < 0 || l.receivedQty > l.qty)))
@@ -351,6 +371,7 @@ export function createDemoBusinessService(context: WorkspaceContext, storage: Lo
             id?: string;
             name: string;
             sku: string;
+            barcode?: string;
             cost: number;
             price: number;
             unit: string;
@@ -359,6 +380,9 @@ export function createDemoBusinessService(context: WorkspaceContext, storage: Lo
         }) {
             manager();
             const state = read(), name = text(input.name), sku = text(input.sku, 64), unit = text(input.unit, 24);
+            const barcode = input.barcode?.trim();
+            if (barcode && (barcode.length > 64 || state.products.some(p => p.id !== input.id && p.barcode.toLowerCase() === barcode.toLowerCase())))
+                throw new Error('Use a unique barcode of at most 64 characters.');
             amount(input.cost);
             amount(input.price);
             const catalogue = taxonomy(state);
@@ -380,9 +404,11 @@ export function createDemoBusinessService(context: WorkspaceContext, storage: Lo
                 if (input.categoryId !== undefined)
                     p.category = category ? { id: category.id, name: category.name } : null;
                 Object.assign(p, { name, sku, cost_price: input.cost, sell_price: input.price, uom: effectiveUnit, allow_decimal_qty: input.decimal });
+                if (barcode !== undefined)
+                    p.barcode = barcode;
             }
             else
-                state.products.push({ id: crypto.randomUUID(), store_id: scope.storeId, name, sku, barcode: '', cost_price: input.cost, sell_price: input.price, stock_qty: 0, uom: effectiveUnit, track_inventory: true, is_active: true, allow_decimal_qty: input.decimal, category: category ? { id: category.id, name: category.name } : null });
+                state.products.push({ id: crypto.randomUUID(), store_id: scope.storeId, name, sku, barcode: barcode ?? '', cost_price: input.cost, sell_price: input.price, stock_qty: 0, uom: effectiveUnit, track_inventory: true, is_active: true, allow_decimal_qty: input.decimal, category: category ? { id: category.id, name: category.name } : null });
             commit(state);
         },
         importProducts(csv: string) {
@@ -518,6 +544,8 @@ export function createDemoBusinessService(context: WorkspaceContext, storage: Lo
         createOrder(input: {
             reference: string;
             supplier: string;
+            expectedDeliveryDate?: string;
+            notes?: string;
             productId?: string;
             qty?: number;
             price?: number;
@@ -539,7 +567,15 @@ export function createDemoBusinessService(context: WorkspaceContext, storage: Lo
             const lines = entries.map(entry => ({ ...line(state, entry), receivedQty: 0 }));
             if (new Set(lines.map(l => l.productId)).size !== lines.length)
                 throw new Error('Combine duplicate purchase products.');
-            state.orders.unshift({ supplierId: supplier.id, id: crypto.randomUUID(), reference, supplier: supplier.name, date: now(), lines, status: 'draft', invoiceReference: null, receipts: [] });
+            state.orders.unshift({ supplierId: supplier.id, id: crypto.randomUUID(), reference, supplier: supplier.name, date: now(), ...draftOrderDetails(input), lines, status: 'draft', invoiceReference: null, receipts: [] });
+            commit(state);
+        },
+        updateDraftOrder(id: string, input: Pick<DemoOrder, 'expectedDeliveryDate' | 'notes'>) {
+            purchaser();
+            const state = read(), order = state.orders.find(order => order.id === id);
+            if (!order || order.status !== 'draft' || order.receipts?.length || order.lines.some(line => (line.receivedQty ?? 0) > 0))
+                throw new Error('Only a demo order without receipts can be edited as a draft.');
+            Object.assign(order, draftOrderDetails(input));
             commit(state);
         },
         receivePurchase(id: string, reference: string, lines: DemoPurchaseReceiptLine[]) { purchaser(); const state = read(); applyReceipt(state, id, reference, lines); commit(state); },

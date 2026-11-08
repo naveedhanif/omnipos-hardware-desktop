@@ -100,7 +100,7 @@ function sectionPanel() {
     return itemGrid(draft, expandedHistory, workspaceService);
 }
 function catalogue() { return `<div class="page-heading"><div><h1>Item catalogue</h1><p>Browse the sample Hardware inventory. Add items to your invoice.</p></div><button class="button" data-action="workspace:Product management">Manage sample products</button></div><div class="catalog-toolbar search-wrap">${icon('search')}<input id="catalog-search" aria-label="Search catalogue" placeholder="Search by name, SKU or barcode" value="${esc(catalogSearch)}"></div><div class="table-scroll"><table class="catalog-table"><thead><tr><th>Item code</th><th>Description</th><th>Category</th><th>Available</th><th>Unit</th><th>Sell price</th><th></th></tr></thead><tbody id="catalog-rows">${catalogRows()}</tbody></table></div><p class="catalog-foot">Inventory is sample data. Adding an item does not reserve or change stock.</p>`; }
-function catalogRows() { const rows = products.filter(p => [p.name, p.sku, p.barcode].some(v => v.toLowerCase().includes(catalogSearch.toLowerCase()))); return rows.map(p => `<tr><td class="sku">${esc(p.sku)}</td><td><strong>${esc(p.name)}</strong><span class="item-category">${p.barcode}</span></td><td>${esc(p.category?.name)}</td><td class="numeric ${p.stock_qty === 0 ? 'stock-warning' : ''}">${p.stock_qty ?? 'Unknown'}</td><td>${esc(p.uom)}</td><td class="numeric">${money(p.sell_price)}</td><td><button class="button" data-add="${p.id}">${icon('plus')} Add to invoice</button></td></tr>`).join('') || '<tr><td colspan="7" class="empty-state">No matching sample items. Try another name or SKU.</td></tr>'; }
+function catalogRows() { const rows = products.filter(p => [p.name, p.sku, p.barcode].some(v => v.toLowerCase().includes(catalogSearch.toLowerCase()))); return rows.map(p => `<tr><td class="sku">${esc(p.sku)}</td><td><strong>${esc(p.name)}</strong><span class="item-category">${esc(p.barcode)}</span></td><td>${esc(p.category?.name)}</td><td class="numeric ${p.stock_qty === 0 ? 'stock-warning' : ''}">${p.stock_qty ?? 'Unknown'}</td><td>${esc(p.uom)}</td><td class="numeric">${money(p.sell_price)}</td><td><button class="button" data-add="${p.id}">${icon('plus')} Add to invoice</button></td></tr>`).join('') || '<tr><td colspan="7" class="empty-state">No matching sample items. Try another name or SKU.</td></tr>'; }
 function switchDoc(n: string) {
     if (!['Sales invoice', 'Item catalogue'].includes(n) && !workspacePages.has(n))
         return;
@@ -838,7 +838,7 @@ app.addEventListener('submit', event => {
     const data = new FormData(form), value = (key: string) => String(data.get(key) ?? '');
     try {
         if (form.dataset.businessForm === 'product') {
-            businessService.saveProduct({ id: value('id') || undefined, name: value('name'), sku: value('sku'), cost: Number(value('cost')), price: Number(value('price')), unit: value('unit'), decimal: value('decimal') === 'true', categoryId: value('categoryId') });
+            businessService.saveProduct({ id: value('id') || undefined, name: value('name'), sku: value('sku'), barcode: value('barcode'), cost: Number(value('cost')), price: Number(value('price')), unit: value('unit'), decimal: value('decimal') === 'true', categoryId: value('categoryId') });
             editingProductId = null;
         }
         else if (['taxonomy-add', 'taxonomy-update'].includes(form.dataset.businessForm))
@@ -903,10 +903,14 @@ app.addEventListener('submit', event => {
     if (demoSession !== 'active' || !form.reportValidity())
         return;
     const data = new FormData(form);
+    const details = { expectedDeliveryDate: String(data.get('expectedDeliveryDate') ?? ''), notes: String(data.get('notes') ?? '') };
     try {
-        if (form.dataset.purchaseForm === 'order') {
+        if (form.dataset.purchaseForm === 'order-details') {
+            businessService.updateDraftOrder(form.dataset.orderId!, details);
+        }
+        else if (form.dataset.purchaseForm === 'order') {
             const lines = Array.from(form.querySelectorAll<HTMLElement>('.purchase-line')).map(row => ({ productId: row.querySelector<HTMLSelectElement>('[name=productId]')!.value, qty: Number(row.querySelector<HTMLInputElement>('[name=qty]')!.value), price: Number(row.querySelector<HTMLInputElement>('[name=price]')!.value) }));
-            businessService.createOrder({ reference: String(data.get('reference') ?? ''), supplier: String(data.get('supplier') ?? ''), lines });
+            businessService.createOrder({ reference: String(data.get('reference') ?? ''), supplier: String(data.get('supplier') ?? ''), lines, ...details });
         }
         else {
             const lines = Array.from(form.querySelectorAll<HTMLElement>('.receipt-line')).map(row => ({ productId: row.dataset.productId!, delivered: Number(row.querySelector<HTMLInputElement>('[name=delivered]')!.value), damaged: Number(row.querySelector<HTMLInputElement>('[name=damaged]')!.value), rejected: Number(row.querySelector<HTMLInputElement>('[name=rejected]')!.value), quarantined: Number(row.querySelector<HTMLInputElement>('[name=quarantined]')!.value) })).filter(row => row.delivered !== 0 || row.damaged !== 0 || row.rejected !== 0 || row.quarantined !== 0);

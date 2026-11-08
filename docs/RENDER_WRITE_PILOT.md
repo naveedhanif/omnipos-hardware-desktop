@@ -38,3 +38,31 @@ Before exposing the desktop POST route, the backend owner needs to enforce activ
 Render deployment: https://dashboard.render.com/web/srv-d963t9urnols73coa13g/deploys
 
 A proposed [checkout operator guard](patches/hardware-checkout-operator-guard.patch) applies to the reviewed Render source. It returns HTTP 403 before reading the checkout payload or calling the checkout RPC when the profile is inactive or the role is outside the proposed owner/admin/manager/cashier set. The role set matches the existing sales-document role vocabulary and needs confirmation against the backend's intended checkout policy. The patch applies cleanly to the recorded revision and its guard passed an isolated nine-case check. Backend route integration and the deployed database checks remain pending.
+
+## Catalogue and purchasing rollout
+
+The Desktop signed-in workspace adds manual Categories, Suppliers and Purchase
+Orders reads alongside Products, Goods Receipts, Supplier Invoices and Supplier
+Returns. Categories shows active records. Suppliers and Purchase Orders require
+an active owner/admin. The proxy verifies the selected Hardware store with
+startup context and projects the record ID, name or LPO number, and status.
+These three upstream registers do not support page/search parameters. The
+proxy applies the search and ten-row page to the returned list, subject to its
+response-size limit. An oversized response fails the read.
+
+The sample workspace supports entering and editing a product barcode, and
+setting or editing the expected delivery date and notes on the same draft LPO.
+It rejects LPO edits after a receipt, including one that accepted no units.
+Sample receipts affect local stock only, and sample supplier invoice drafts
+remain separate from live supplier invoice matching or return posting.
+
+### Gates for live writes
+
+| Slice | Reviewed OmniPOS contract | Evidence needed before enabling |
+| --- | --- | --- |
+| Categories and products | POST and PUT under `/api/hardware/categories` and `/api/hardware/products`. Category uses `storeId`, `name`, optionally `parentId`. Product uses `storeId`, `name`, `sku`, `barcode`, `category_id`, `unit_of_measure_id`, `cost_price`, `sell_price`, and the product options accepted by the route. | Verify deployed operator permission, same-store category/unit checks, duplicate SKU/barcode behavior under retries, and authoritative readback. The current product-units GET seeds defaults when empty. It is excluded from the Desktop read-only allowlist. A side-effect-free unit lookup or an explicit approved provisioning workflow is required. |
+| Suppliers and draft LPO | Supplier POST/PUT under `/api/hardware/suppliers`. Standard LPO POST accepts `storeId`, `supplier_id`, `expected_delivery_date`, `notes`, and `items` containing `product_id`, `ordered_qty`, and `unit_cost`. LPO metadata edit uses PUT to the specific order with `storeId`, `notes`, and `expected_delivery_date`. | Verify deployed active-role and resource checks, supplier eligibility, draft-only update enforcement, and behavior on a refused or interrupted create. The reviewed create route calls the draft RPC before approval evaluation. A refused response can therefore leave a saved draft. |
+| Receiving and supplier follow-through | POST to `/api/hardware/purchase-orders/:id/receive`; supplier invoices and returns have separate capability/approval routes. | Verify the selected store's receiving mode, approval and location scope, discrepancy representation, replay protection, and matching/return capabilities before permitting a post. Compare the LPO, receipt and resulting stock in Desktop and Render. |
+
+Local tests use fixtures for the read proxy and sample service. Deployed
+signed-in Kuwait reads and all business writes require separate verification.

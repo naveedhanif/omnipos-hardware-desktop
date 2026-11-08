@@ -17,3 +17,33 @@ test('catalogue names can be managed, referenced entries cannot be archived, and
 test('contact edits preserve snapshots and outstanding balances prevent archiving after a rename', () => { const { a } = setup(); a.recordSale(createSampleDraft(defaultContext)); const contact = a.read().customers[0]; a.saveParty('customers', { id: contact.id, name: 'Renamed customer', contact: 'sample' }); assert.equal(a.read().sales[0].customer, 'Al Noor Building Maintenance'); assert.throws(() => a.saveParty('customers', { id: contact.id, name: 'Renamed customer', contact: 'sample', active: false })); a.saveParty('suppliers', { name: 'Spare supplier', contact: 'sample' }); const supplier = a.read().suppliers.at(-1)!; a.saveParty('suppliers', { id: supplier.id, name: supplier.name, contact: 'updated', active: false }); assert.equal(a.read().suppliers.at(-1)!.active, false); });
 test('multi-line receipts post only accepted demo quantities, validate all rows and replay safely', () => { const { a } = setup(), p = a.listProducts(); a.createOrder({ reference: 'MULTI-1', supplier: a.read().suppliers[0].name, lines: [{ productId: p[0].id, qty: 10, price: 20 }, { productId: p[1].id, qty: 5, price: 3 }] }); const id = a.read().orders[0].id, receipt = [{ productId: p[0].id, delivered: 6, damaged: 1, rejected: 1, quarantined: 0 }, { productId: p[1].id, delivered: 2, damaged: 0, rejected: 0, quarantined: 0 }]; a.receivePurchase(id, 'RCV-1', receipt); assert.equal(a.listProducts()[0].stock_qty, p[0].stock_qty! + 4); assert.equal(a.read().orders[0].status, 'partial'); a.receivePurchase(id, 'RCV-1', receipt); assert.equal(a.read().orders[0].receipts!.length, 1); assert.throws(() => a.createSupplierInvoice(id, 'EARLY')); assert.throws(() => a.receivePurchase(id, 'BAD', [{ productId: p[0].id, delivered: 1, damaged: 2, rejected: 0, quarantined: 0 }])); assert.equal(a.read().orders[0].receipts!.length, 1); a.receiveOrder(id); assert.equal(a.read().orders[0].status, 'received'); assert.equal(a.listProducts()[0].stock_qty, p[0].stock_qty! + 10); a.createSupplierInvoice(id, 'SUP-MULTI'); });
 test('reversing a demo allocation preserves its audit entry, restores balance and permits a later full sale reversal', () => { const { a } = setup(); const id = a.recordSale(createSampleDraft(defaultContext)); a.recordAccountPayment(id, 10, 'ALLOC-REV'); const receipt = a.read().receipts[0]; a.reverseAccountPayment(receipt.id, 'Sample correction'); assert.equal(a.read().receipts.length, 1); assert.equal(a.read().receipts[0].reversed, true); assert.equal(a.balances()[0].outstanding, 96550); assert.throws(() => a.reverseAccountPayment(receipt.id, 'Again')); assert.throws(() => a.recordAccountPayment(id, 10, 'ALLOC-REV')); a.refundSale(id); assert.equal(a.balances()[0].outstanding, 0); });
+
+test('sample product barcode is searchable data, unique in scope, and editable without changing stock', () => {
+    const { a } = setup();
+    const input = { name: 'Test clamp', sku: 'FIXTURE-CLAMP', barcode: 'TEST-BARCODE', cost: 1.125, price: 2.5, unit: 'pcs', decimal: false };
+    a.saveProduct(input);
+    const saved = a.listProducts().find(product => product.sku === input.sku)!;
+    assert.equal(saved.barcode, input.barcode);
+    assert.throws(() => a.saveProduct({ ...input, sku: 'FIXTURE-OTHER', barcode: 'test-barcode' }), /unique barcode/);
+    a.saveProduct({ ...input, id: saved.id, barcode: '' });
+    const edited = a.listProducts().find(product => product.id === saved.id)!;
+    assert.equal(edited.barcode, '');
+    assert.equal(edited.stock_qty, 0);
+});
+
+test('sample LPO delivery details are editable on the same draft until a receipt exists', () => {
+    const { a } = setup();
+    const p = a.listProducts()[0], supplier = a.read().suppliers[0];
+    a.createOrder({ reference: 'LPO-DETAILS', supplier: supplier.name, productId: p.id, qty: 2, price: 1.125, expectedDeliveryDate: '2026-11-21', notes: 'Original' });
+    const order = a.read().orders[0];
+    assert.throws(() => a.updateDraftOrder(order.id, { expectedDeliveryDate: '2026-11-31' }), /valid expected delivery/);
+    a.updateDraftOrder(order.id, { expectedDeliveryDate: '2026-11-22', notes: 'Changed' });
+    const edited = a.read().orders[0];
+    assert.equal(edited.id, order.id);
+    assert.equal(edited.expectedDeliveryDate, '2026-11-22');
+    assert.equal(edited.notes, 'Changed');
+    assert.deepEqual(edited.lines, order.lines);
+    a.receivePurchase(order.id, 'PARTIAL-DETAILS', [{ productId: p.id, delivered: 1, damaged: 0, rejected: 0, quarantined: 0 }]);
+    assert.throws(() => a.updateDraftOrder(order.id, { notes: 'Too late' }), /without receipts/);
+    assert.equal(a.read().orders[0].notes, 'Changed');
+});
