@@ -1,3 +1,4 @@
+import { recordSaveRoutes, type RecordSaveFields, type RecordSaveKind, type RecordSaveResult } from './desktopRecordSave.ts';
 import { createHardwareReadAdapter } from './hardwareReadAdapter.ts';
 import { resolveHardwareScope, uuid } from './decoders.ts';
 import { HardwareReadError, type ReadIdentity, type StartupContext, type BackendStore } from './contracts.ts';
@@ -15,8 +16,8 @@ export interface WorkspaceSummary {
     canReadPurchasing: boolean;
     expiresAt: number;
 }
-/** Memory-only, manual reads. No auth refresh, background fetch, storage, retries or writes. */
-export function createReadOnlyWorkspace(ports: CheckPorts) {
+/** Memory-only workspace with manual operations. Record saves require an explicit transport. */
+export function createReadOnlyWorkspace(ports: CheckPorts, writeFetch?: typeof fetch) {
     const now = ports.now ?? Date.now;
     let revision = 0, session: CheckSession | null = null, startup: StartupContext | null = null, identity: ReadIdentity | null = null;
     let request: AbortController | null = null, busy = false;
@@ -80,6 +81,38 @@ export function createReadOnlyWorkspace(ports: CheckPorts) {
     }
     return {
         clear, summary,
+        async saveRecord(kind: RecordSaveKind, fields: RecordSaveFields): Promise<RecordSaveResult> {
+            const state = summary();
+            const storeId = identity?.storeId;
+            if (!writeFetch || busy || !storeId || !state?.canReadPurchasing)
+                return { status: 'refused' };
+            const attempt = revision;
+            const token = session!.accessToken;
+            busy = true;
+            try {
+                const response = await writeFetch(recordSaveRoutes[kind], {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify({ ...fields, storeId }), credentials: 'omit', redirect: 'error', cache: 'no-store',
+                    signal: AbortSignal.timeout(50000),
+                });
+                current(attempt);
+                const data = await response.json();
+                current(attempt);
+                if (response.ok && data?.code === 'SAVED' && uuid(data.id) && (!fields.id || data.id === fields.id))
+                    return { status: 'saved', id: data.id };
+                if (response.status === 409 && data?.code === 'SAVE_CONFLICT')
+                    return { status: 'conflict' };
+                if (data?.code === 'SAVE_REFUSED' || data?.code === 'SESSION_REQUIRED')
+                    return { status: 'refused' };
+                return { status: 'uncertain' };
+            } catch {
+                return { status: 'uncertain' };
+            } finally {
+                if (attempt === revision)
+                    busy = false;
+            }
+        },
         checkActiveTill() {
             return readScoped((storeId, _fresh, signal) => adapter.getActiveTill(storeId, signal));
         },

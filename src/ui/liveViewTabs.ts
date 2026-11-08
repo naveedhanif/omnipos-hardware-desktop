@@ -61,5 +61,5 @@ export function liveSessionNotice(expiresAt: number): string {
     const date = new Date(expiresAt);
     if (!Number.isFinite(date.getTime()))
         return '';
-    return `<p class="live-session-notice">Read-only session ends at <time datetime="${date.toISOString()}">${esc(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }))}</time>. Reloading signs you out. Clearing displayed records keeps this session open.</p>`;
+    return `<p class="live-session-notice">Session ends at <time datetime="${date.toISOString()}">${esc(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }))}</time>. Reloading signs you out. Clearing displayed records keeps this session open.</p>`;
 }

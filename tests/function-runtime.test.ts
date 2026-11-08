@@ -65,6 +65,13 @@ test('unbundled emitted API entries start in plain Node and refuse unauthenticat
                 const {default:handler}=await import(url);
                 const route = ${JSON.stringify(paths)}[index];
                 const path = route === '/api/startup-context' ? route : route + '?storeId=33333333-3333-4333-8333-333333333333' + (route === '/api/hardware/till/active' ? '' : '&page=1&limit=10');
+                if (['/api/hardware/categories', '/api/hardware/products', '/api/hardware/suppliers'].includes(route)) {
+                    let body = '';
+                    const res = { statusCode: 0, setHeader() {}, end: value => body = value };
+                    await handler({method:'POST',url:route,headers:{}},res);
+                    assert.equal(res.statusCode,401);
+                    assert.equal(JSON.parse(body).code,'SESSION_REQUIRED');
+                }
                 for(const method of ['GET','POST','PUT','PATCH','DELETE']) {
                     const headers={};let body='';
                     const res={statusCode:0,setHeader:(k,v)=>headers[k]=v,end:v=>body=v};

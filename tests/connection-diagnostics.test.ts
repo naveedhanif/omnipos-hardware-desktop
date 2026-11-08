@@ -33,11 +33,21 @@ test('active till projection rejects fallback and foreign stores and hides till 
     const storeId = '33333333-3333-4333-8333-333333333333';
     const input = { method: 'GET', path: '/api/hardware/till/active?storeId=' + storeId, authorization: 'Bearer fixture-token', apiOrigin: hardwareTargets.apiOrigin };
     const session = { id: '44444444-4444-4444-8444-444444444444', store_id: storeId, status: 'open', opening_float: 100 };
-    const read = (payload: unknown) => proxyRead(input, async () => Response.json(payload));
+    const startup = {
+        user: { id: session.id },
+        profile: { id: session.id, organization_id: session.id, role: 'owner', is_active: true },
+        organization: { id: session.id, name: 'Fixture' },
+        stores: [{ id: storeId, organization_id: session.id, name: 'Kuwait', business_type: 'hardware', currency: 'KWD' }],
+    };
+    const read = (payload: unknown) => proxyRead(input, async url => Response.json(String(url).endsWith('/api/startup-context') ? startup : payload));
     assert.deepEqual(await read({ session, demoFallback: false }), { status: 200, body: '{"open":true}' });
     assert.deepEqual(await read({ session: null, demoFallback: false }), { status: 200, body: '{"open":false}' });
     assert.equal((await read({ session, demoFallback: true })).status, 502);
     assert.equal((await read({ session: { ...session, store_id: 'foreign' }, demoFallback: false })).status, 502);
+    assert.equal((await proxyRead(input, async url => {
+        assert.ok(String(url).endsWith('/api/startup-context'));
+        return Response.json({ ...startup, stores: [] });
+    })).status, 403);
     assert.equal((await proxyRead({ ...input, path: input.path + '&storeId=' + storeId }, async () => {
         assert.fail('Duplicate scope must be rejected before forwarding');
     })).status, 404);

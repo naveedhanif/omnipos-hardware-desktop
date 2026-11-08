@@ -1,1 +1,2 @@
-export { readOnlyHandler as default } from '../../server/readOnlyProxy.ts';
+import { desktopRecordHandler } from '../../server/desktopRecordSave.ts';
+export default desktopRecordHandler('category');

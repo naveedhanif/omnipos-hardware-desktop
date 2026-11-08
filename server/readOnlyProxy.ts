@@ -35,13 +35,14 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
     try {
         const route = new URL(input.path, hardwareTargets.apiOrigin);
         const directory = directoryForPath(route.pathname);
+        const tillCheck = route.pathname === '/api/hardware/till/active';
         const signal = AbortSignal.timeout(upstreamReadTimeoutMs);
         const upstream = (path: string) => fetcher(hardwareTargets.apiOrigin + path, {
             method: 'GET', headers: { Authorization: authorization, Accept: 'application/json' },
             redirect: 'error', cache: 'no-store', signal,
         });
         let upstreamPath = input.path, directoryScope: HardwareReadScope | undefined;
-        if (directory) {
+        if (directory || tillCheck) {
             const startup = await upstream('/api/startup-context');
             if (!startup.ok)
                 return fail([401, 403].includes(startup.status) ? startup.status : 502, 'UPSTREAM_READ_REFUSED');
@@ -58,7 +59,7 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             catch {
                 return fail(403, 'UPSTREAM_READ_REFUSED');
             }
-            if (directory !== 'categories' && !['owner', 'admin'].includes(context.profile!.role.toLowerCase()))
+            if (directory && directory !== 'categories' && !['owner', 'admin'].includes(context.profile!.role.toLowerCase()))
                 return fail(403, 'UPSTREAM_READ_REFUSED');
             upstreamPath = `${route.pathname}?${new URLSearchParams({ storeId })}`;
         }
@@ -82,7 +83,7 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             const page = projectHardwareDirectory(directory, payload, directoryScope, Number(route.searchParams.get('page')), route.searchParams.get('search') ?? '');
             return { status: 200, body: JSON.stringify(page) };
         }
-        if (route.pathname === '/api/hardware/till/active') {
+        if (tillCheck) {
             if (payload?.demoFallback !== false)
                 return fail(502, 'UPSTREAM_INVALID_RESPONSE');
             const till = payload.session;

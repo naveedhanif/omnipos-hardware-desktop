@@ -66,3 +66,19 @@ remain separate from live supplier invoice matching or return posting.
 
 Local tests use fixtures for the read proxy and sample service. Deployed
 signed-in Kuwait reads and all business writes require separate verification.
+
+## Desktop record saves
+
+An active owner or admin can use the signed-in Desktop forms to create and
+edit categories, products, and suppliers through the existing API. Product
+creation uses the backend's default Each unit. Product edits preserve the
+unit and other fields outside the form. The server verifies the selected
+Hardware store and the returned record's identity. After an uncertain result,
+the workspace asks the operator to reload the register and look for the
+change before trying again.
+
+Desktop checks startup scope before asking for the till status. Live LPO
+creation, LPO editing, receiving, and cash posting remain outside the
+Desktop save routes. The outstanding gates are the order creation and
+status guarantees above, and evidence for the checkout function's till,
+product scope, and replay behavior.
