@@ -1,3 +1,4 @@
+import { decodeSaleReceipt } from './saleReceiptRead.ts';
 import { decodeDirectoryPage, directoryRoutes, type HardwareDirectory } from './hardwareDirectories.ts';
 import { projectReadCode, projectReadReference } from './safeReadDiagnostics.ts';
 import { decodeRateDifferencePage } from './rateDifferenceRead.ts';
@@ -154,6 +155,14 @@ export function createHardwareReadAdapter(ports: ReadAdapterPorts) {
             if (q.search)
                 query.set('search', q.search);
             return decodeInventoryPage(await read(`/api/hardware/inventory/balances?${query}`, identity, options?.signal), scope, q.page);
+        },
+        async getHardwareSaleReceipt(storeId: string, saleId: string, signal: AbortSignal) {
+            const identity = capture();
+            scoped(identity, storeId);
+            if (!uuid(saleId))
+                throw new HardwareReadError('not-ready', 'Enter a valid sale ID.');
+            const query = new URLSearchParams({ storeId, saleId });
+            return decodeSaleReceipt(await read(`/api/hardware/sales/invoices?${query}`, identity, signal), storeId, saleId);
         },
         async getHardwareInvoices(storeId: string, options?: ReadWindow & {
             signal?: AbortSignal;

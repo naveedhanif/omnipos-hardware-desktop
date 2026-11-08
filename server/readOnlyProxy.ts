@@ -1,3 +1,4 @@
+import { projectSaleReceipt } from '../src/integration/saleReceiptRead.ts';
 import { decodeStartup, record, resolveHardwareScope, uuid } from '../src/integration/decoders.ts';
 import type { HardwareReadScope } from '../src/integration/contracts.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -35,6 +36,7 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
     try {
         const route = new URL(input.path, hardwareTargets.apiOrigin);
         const directory = directoryForPath(route.pathname);
+        const saleId = route.pathname === '/api/hardware/sales/invoices' ? route.searchParams.get('saleId') : null;
         const tillCheck = route.pathname === '/api/hardware/till/active';
         const signal = AbortSignal.timeout(upstreamReadTimeoutMs);
         const upstream = (path: string) => fetcher(hardwareTargets.apiOrigin + path, {
@@ -42,7 +44,7 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             redirect: 'error', cache: 'no-store', signal,
         });
         let upstreamPath = input.path, directoryScope: HardwareReadScope | undefined;
-        if (directory || tillCheck) {
+        if (directory || tillCheck || saleId) {
             const startup = await upstream('/api/startup-context');
             if (!startup.ok)
                 return fail([401, 403].includes(startup.status) ? startup.status : 502, 'UPSTREAM_READ_REFUSED');
@@ -59,9 +61,9 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             catch {
                 return fail(403, 'UPSTREAM_READ_REFUSED');
             }
-            if (directory && directory !== 'categories' && !['owner', 'admin'].includes(context.profile!.role.toLowerCase()))
+            if ((saleId || (directory && directory !== 'categories')) && !['owner', 'admin'].includes(context.profile!.role.toLowerCase()))
                 return fail(403, 'UPSTREAM_READ_REFUSED');
-            upstreamPath = `${route.pathname}?${new URLSearchParams({ storeId })}`;
+            upstreamPath = `${saleId ? `/api/hardware/sales/${saleId}/receipt` : route.pathname}?${new URLSearchParams({ storeId })}`;
         }
         const response = await upstream(upstreamPath);
         const reviewedCodes = capabilityCodes[route.pathname];
@@ -79,6 +81,8 @@ export async function proxyRead(input: ProxyInput, fetcher: typeof fetch): Promi
             return fail(502, 'UPSTREAM_INVALID_RESPONSE');
         const body = await limitedText(response);
         const payload = JSON.parse(body);
+        if (saleId && directoryScope)
+            return { status: 200, body: JSON.stringify(projectSaleReceipt(payload, directoryScope.storeId, saleId)) };
         if (directory && directoryScope) {
             const page = projectHardwareDirectory(directory, payload, directoryScope, Number(route.searchParams.get('page')), route.searchParams.get('search') ?? '');
             return { status: 200, body: JSON.stringify(page) };

@@ -82,3 +82,9 @@ creation, LPO editing, receiving, and cash posting remain outside the
 Desktop save routes. The outstanding gates are the order creation and
 status guarantees above, and evidence for the checkout function's till,
 product scope, and replay behavior.
+
+Desktop owners and admins can check an existing sale by its ID in the invoice
+register. The receipt lookup checks the selected store and returns the recorded
+reference, tender, status and total. It supports comparing a known sale after
+checkout. A missing receipt does not prove that an attempt failed, and the
+lookup does not enable checkout posting.

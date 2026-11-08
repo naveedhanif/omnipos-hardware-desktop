@@ -113,6 +113,19 @@ export function createReadOnlyWorkspace(ports: CheckPorts, writeFetch?: typeof f
                     busy = false;
             }
         },
+        getSaleReceipt(saleId: string) {
+            return readScoped(async (storeId, fresh, signal) => {
+                if (!['owner', 'admin'].includes(fresh.profile!.role.toLowerCase()))
+                    throw new HardwareReadError('forbidden', 'Owner/admin access is required for sale receipts.');
+                try {
+                    return await adapter.getHardwareSaleReceipt(storeId, saleId, signal);
+                } catch (error) {
+                    if (error instanceof HardwareReadError && error.status === 404)
+                        return null;
+                    throw error;
+                }
+            });
+        },
         checkActiveTill() {
             return readScoped((storeId, _fresh, signal) => adapter.getActiveTill(storeId, signal));
         },

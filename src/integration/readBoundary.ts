@@ -10,6 +10,8 @@ export function allowedReadPath(path: string): boolean {
         return false;
     if (url.pathname === '/api/hardware/till/active')
         return [...url.searchParams.keys()].length === 1 && uuid(url.searchParams.get('storeId'));
+    if (url.pathname === '/api/hardware/sales/invoices' && url.searchParams.has('saleId'))
+        return [...url.searchParams.keys()].length === 2 && uuid(url.searchParams.get('storeId')) && uuid(url.searchParams.get('saleId'));
     if (url.pathname === '/api/startup-context')
         return !url.search;
     if (!directoryForPath(url.pathname) && !['/api/hardware/products', '/api/hardware/inventory/balances', '/api/hardware/sales/invoices', '/api/hardware/goods-receipts', '/api/hardware/supplier-invoices', '/api/hardware/supplier-returns', '/api/hardware/supplier-invoices/reports/rate-differences'].includes(url.pathname))
